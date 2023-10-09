@@ -102,6 +102,16 @@ resource aks 'Microsoft.ContainerService/managedClusters@2023-06-02-preview' = {
         objectId: kubeletIdentity.properties.principalId
       }
     }
+    agentPoolProfiles: [
+      {
+        name: 'linux01'
+        osDiskSizeGB: 0
+        count: 1
+        vmSize: 'Standard_D2s_v3'
+        osType: 'Linux'
+        mode: 'System'
+      }
+    ]
   }
 }
 
