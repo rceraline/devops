@@ -1,0 +1,137 @@
+trigger:
+  branches:
+    include:
+      - main
+  paths:
+    include:
+      - 2023-10-terraform-pipeline
+
+variables:
+  artifactName: terraform
+  serviceConnection: AzureSubscription
+  buildAgent: ubuntu-latest
+  terraformDir: $(System.DefaultWorkingDirectory)/2023-10-terraform-pipeline/terraform
+  target: $(build.artifactstagingdirectory)
+  publishedArtifactsDirectory: "$(Pipeline.Workspace)/$(artifactName)"
+  planName: tfplan
+  resourceGroupToLock: rg-01
+  resourceLockName: terraform-lock
+
+pool:
+  vmImage: $(buildAgent)
+
+stages:
+  - stage: Plan
+    jobs:
+      - job: Plan
+        steps:
+          - task: TerraformCLI@1
+            displayName: terraform init
+            inputs:
+              command: "init"
+              backendType: "azurerm"
+              workingDirectory: "$(terraformDir)"
+              backendServiceArm: "$(serviceConnection)"
+
+          - task: TerraformCLI@1
+            displayName: terraform validate
+            inputs:
+              command: "validate"
+              backendType: "azurerm"
+              workingDirectory: "$(terraformDir)"
+              environmentServiceName: "$(serviceConnection)"
+
+          - task: AzureCLI@2
+            displayName: Delete lock
+            inputs:
+              azureSubscription: $(serviceConnection)
+              scriptType: "pscore"
+              scriptLocation: "inlineScript"
+              inlineScript: |
+                az lock delete --name $(resourceLockName) --resource-group $(resourceGroupToLock)
+
+          - task: TerraformCLI@1
+            displayName: terraform plan
+            inputs:
+              command: "plan"
+              backendType: "azurerm"
+              workingDirectory: "$(terraformDir)"
+              commandOptions: "-input=false -out=$(planName)"
+              environmentServiceName: "$(serviceConnection)"
+              publishPlanResults: "Terraform plan"
+
+          - task: AzureCLI@2
+            displayName: Create lock
+            inputs:
+              azureSubscription: $(serviceConnection)
+              scriptType: "pscore"
+              scriptLocation: "inlineScript"
+              inlineScript: |
+                if($(az group exists --name $(resourceGroupToLock)) -eq $true)
+                {
+                  az lock create --name $(resourceLockName) --resource-group $(resourceGroupToLock) --lock-type ReadOnly --notes "This resource is managed by Terraform."
+                }
+
+          - task: CopyFiles@2
+            displayName: Copy files
+            inputs:
+              SourceFolder: "$(terraformDir)"
+              Contents: |
+                .terraform.lock.hcl
+                **/*.tf
+                **/*.tfvars
+                **/*tfplan*
+              TargetFolder: "$(target)"
+
+          - publish: "$(target)"
+            artifact: "$(artifactName)"
+
+  - stage: Deploy
+    displayName: Deploy
+    condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))
+    jobs:
+      - deployment: Deploy
+        environment: Azure
+        pool:
+          vmImage: $(buildAgent)
+        strategy:
+          runOnce:
+            deploy:
+              steps:
+                - download: "current"
+                  artifact: $(artifactName)
+
+                - task: AzureCLI@2
+                  displayName: Delete lock
+                  inputs:
+                    azureSubscription: $(serviceConnection)
+                    scriptType: "pscore"
+                    scriptLocation: "inlineScript"
+                    inlineScript: |
+                      az lock delete --name $(resourceLockName) --resource-group $(resourceGroupToLock)
+
+                - task: TerraformCLI@1
+                  displayName: terraform init
+                  inputs:
+                    command: "init"
+                    backendType: "azurerm"
+                    workingDirectory: "$(publishedArtifactsDirectory)"
+                    backendServiceArm: "$(serviceConnection)"
+
+                - task: TerraformCLI@1
+                  displayName: terraform apply
+                  inputs:
+                    command: "apply"
+                    commandOptions: '-input=false "$(planName)"'
+                    backendType: "azurerm"
+                    workingDirectory: "$(publishedArtifactsDirectory)"
+                    environmentServiceName: "$(serviceConnection)"
+
+                - task: AzureCLI@2
+                  displayName: Create lock
+                  inputs:
+                    azureSubscription: $(serviceConnection)
+                    scriptType: "pscore"
+                    scriptLocation: "inlineScript"
+                    inlineScript: |
+                      az lock create --name $(resourceLockName) --resource-group $(resourceGroupToLock) --lock-type ReadOnly --notes "This resource is managed by Terraform."

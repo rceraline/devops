@@ -1,0 +1,24 @@
+apiVersion: windows.k8s.io/v1
+kind: GMSACredentialSpec
+metadata:
+  name: aks-gmsa-spec
+credspec:
+  ActiveDirectoryConfig:
+    GroupManagedServiceAccounts:
+      - Name: Gmsa
+        Scope: mycompany
+      - Name: Gmsa
+        Scope: mycompany.local
+    HostAccountConfig:
+      PluginGUID: "{CCC2A336-D7F3-4818-A213-272B7924213E}"
+      PortableCcgVersion: "1"
+      PluginInput: "ObjectId=ccbcf7e6-9a9a-434e-8164-5b365312a41e;SecretUri=https://kv-yldkhz3mm5uwe.vault.azure.net/secrets/GMSADomainUserCred"
+  CmsPlugins:
+    - ActiveDirectory
+  DomainJoinConfig:
+    DnsName: mycompany.local
+    DnsTreeName: mycompany.local
+    Guid: c81feb2b-bd34-4568-9ebc-81e8a8ea1b51
+    MachineAccountName: Gmsa
+    NetBiosName: mycompany
+    Sid: S-1-5-21-3810415138-1110817698-543942465

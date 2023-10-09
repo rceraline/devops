@@ -1,0 +1,45 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: gmsa
+  name: gmsa
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: gmsa
+  template:
+    metadata:
+      labels:
+        app: gmsa
+    spec:
+      containers:
+        - name: gmsa
+          image: cryldkhz3mm5uwe.azurecr.io/gmsa:1.0
+          ports:
+            - containerPort: 80
+          livenessProbe:
+            initialDelaySeconds: 20
+            timeoutSeconds: 15
+            httpGet:
+              port: 80
+              path: /health
+          readinessProbe:
+            initialDelaySeconds: 20
+            timeoutSeconds: 15
+            httpGet:
+              port: 80
+              path: /health
+          resources:
+            limits:
+              memory: "512Mi"
+              cpu: "1000m"
+            requests:
+              memory: "256Mi"
+              cpu: "500m"
+      securityContext:
+        windowsOptions:
+          gmsaCredentialSpecName: aks-gmsa-spec
+      nodeSelector:
+        kubernetes.io/os: windows
