@@ -11,7 +11,7 @@ resources:
       name: rceraline/devops-argocd
 
 variables:
-  - name: artifact
+  - name: artifactName
     value: deployment
   - name: componentName
     value: app-01
