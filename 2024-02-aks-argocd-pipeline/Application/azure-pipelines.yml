@@ -1,6 +1,7 @@
 trigger:
   branches:
-    - main
+    include:
+      - main
 
 resources:
   repositories:
