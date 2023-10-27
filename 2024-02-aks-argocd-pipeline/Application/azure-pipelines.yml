@@ -9,6 +9,7 @@ resources:
       type: github
       endpoint: rceraline
       name: rceraline/devops-argocd
+      ref: main
 
 variables:
   - name: artifactName
