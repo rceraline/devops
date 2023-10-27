@@ -129,9 +129,7 @@ stages:
                     script: |
                       git config user.email "build@remi-solutions.com"
                       git config user.name "build"
-                      git stash
                       git checkout origin HEAD:main
-                      git stash pop
                       git add .
                       git commit -m "$(componentName): production deployment"
                       git push origin HEAD:main
@@ -171,9 +169,7 @@ stages:
                     script: |
                       git config user.email "build@remi-solutions.com"
                       git config user.name "build"
-                      git stash
                       git checkout origin HEAD:main
-                      git stash pop
                       git add .
                       git commit -m "$(componentName): production deployment"
                       git push origin HEAD:main
