@@ -131,9 +131,10 @@ stages:
                       git config user.name "build"
                       git stash
                       git checkout origin HEAD:main
+                      git pull
                       git stash pop
                       git add .
-                      git commit -m "$(componentName): production deployment"
+                      git commit -m "$(componentName): staging deployment"
                       git push origin HEAD:main
 
   - stage: Production
@@ -173,6 +174,7 @@ stages:
                       git config user.name "build"
                       git stash
                       git checkout origin HEAD:main
+                      git pull
                       git stash pop
                       git add .
                       git commit -m "$(componentName): production deployment"
