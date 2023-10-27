@@ -1,0 +1,14 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: app-01
+  name: app-01
+spec:
+  template:
+    spec:
+      containers:
+        - name: app-01
+          env:
+            - name: ASPNETCORE_ENVIRONMENT
+              value: staging

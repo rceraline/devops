@@ -1,0 +1,179 @@
+trigger:
+  branches:
+    - main
+
+resources:
+  repositories:
+    - repository: devops-argocd
+      type: github
+      endpoint: rceraline
+      name: rceraline/devops-argocd
+
+variables:
+  - name: artifact
+    value: deployment
+  - name: componentName
+    value: app-01
+
+stages:
+  - stage: Build
+    jobs:
+      - job: Build
+
+        pool:
+          vmImage: ubuntu-latest
+
+        variables:
+          applicationFolder: $(Build.Repository.LocalPath)/2024-02-aks-argocd-pipeline/Application/app-01
+          containerRegistry: AzureContainerRegistry
+          containerRepository: app-01
+          buildConfiguration: "Release"
+          deploymentFolder: $(applicationFolder)/deployment
+          outputFolder: $(applicationFolder)/output/
+
+        steps:
+          - task: DotNetCoreCLI@2
+            displayName: Build & Publish
+            inputs:
+              command: "publish"
+              publishWebProjects: false
+              modifyOutputPath: false
+              workingDirectory: $(applicationFolder)
+              arguments: --output $(outputFolder) -c $(buildConfiguration) --self-contained true
+              zipAfterPublish: false
+
+          - task: Docker@2
+            displayName: Login to ACR
+            inputs:
+              command: login
+              containerRegistry: $(containerRegistry)
+
+          - task: Docker@2
+            displayName: Build Docker image
+            inputs:
+              containerRegistry: $(containerRegistry)
+              repository: $(containerRepository)
+              command: "build"
+              Dockerfile: $(applicationFolder)/Dockerfile
+              buildContext: $(applicationFolder)
+              tags: |
+                $(Build.BuildId)
+                latest
+
+          - task: Docker@2
+            displayName: Push Docker image
+            condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))
+            inputs:
+              containerRegistry: $(containerRegistry)
+              repository: $(containerRepository)
+              command: "push"
+              tags: |
+                $(Build.BuildId)
+                latest
+
+          - task: CopyFiles@2
+            displayName: Copy deployment manifests
+            inputs:
+              sourceFolder: ${{ parameters.deploymentFolder }}
+              contents: "**"
+              targetFolder: $(Build.ArtifactStagingDirectory)
+              overwrite: true
+
+          - task: qetza.replacetokens.replacetokens-task.replacetokens@3
+            displayName: Replace tokens
+            inputs:
+              rootDirectory: $(Build.ArtifactStagingDirectory)/base
+              targetFiles: "deployment.yaml"
+              encoding: auto
+              writeBOM: true
+              escapeType: no escaping
+              actionOnMissing: log warning
+              tokenPrefix: __
+              tokenSuffix: __
+
+          - publish: $(Build.ArtifactStagingDirectory)
+            artifact: ${{ parameters.artifactName }}
+
+  - stage: Staging
+    jobs:
+      - deployment: Staging
+
+        environment:
+          name: aks-staging
+
+        pool:
+          vmImage: "ubuntu-latest"
+
+        strategy:
+          runOnce:
+            deploy:
+              steps:
+                - checkout: devops-argocd
+                  persistCredentials: true
+                  clean: true
+
+                - task: DownloadPipelineArtifact@2
+                  inputs:
+                    artifact: $(artifactName)
+                    patterns: |
+                      base/**
+                      overlays/staging/**
+
+                    path: $(Build.Repository.LocalPath)/kustomize/$(componentName)
+
+                - task: PowerShell@2
+                  displayName: Commit to Deployment repo
+                  inputs:
+                    targetType: "inline"
+                    workingDirectory: $(Build.Repository.LocalPath)
+                    script: |
+                      git config user.email "build@remi-solutions.com"
+                      git config user.name "build"
+                      git stash
+                      git checkout main
+                      git stash pop
+                      git add .
+                      git commit -m "$(componentName): staging deployment"
+                      git push origin
+
+  - stage: Production
+    jobs:
+      - deployment: Production
+
+        environment:
+          name: aks-production
+
+        pool:
+          vmImage: "ubuntu-latest"
+
+        strategy:
+          runOnce:
+            deploy:
+              steps:
+                - checkout: devops-argocd
+                  persistCredentials: true
+                  clean: true
+
+                - task: DownloadPipelineArtifact@2
+                  inputs:
+                    artifact: $(artifactName)
+                    patterns: |
+                      base/**
+                      overlays/production/**
+
+                    path: $(Build.Repository.LocalPath)/kustomize/$(componentName)
+
+                - task: PowerShell@2
+                  displayName: Commit to Deployment repo
+                  inputs:
+                    targetType: "inline"
+                    workingDirectory: $(Build.Repository.LocalPath)
+                    script: |
+                      git config user.email "build@remi-solutions.com"
+                      git config user.name "build"
+                      git stash
+                      git checkout main
+                      git stash pop
+                      git add .
+                      git commit -m "$(componentName): production deployment"
+                      git push origin

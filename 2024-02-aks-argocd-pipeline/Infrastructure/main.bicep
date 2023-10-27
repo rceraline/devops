@@ -34,15 +34,15 @@ resource kubeletIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2021-
   location: location
 }
 
-resource acrRoleAssignmentForUser 'Microsoft.Authorization/roleAssignments@2020-10-01-preview' = {
-  name: guid(currentUserObjectId, contributorRoleDefinitionId)
-  scope: acr
-  properties: {
-    roleDefinitionId: contributorRoleDefinitionId
-    principalId: currentUserObjectId
-    principalType: 'User'
-  }
-}
+// resource acrRoleAssignmentForUser 'Microsoft.Authorization/roleAssignments@2020-10-01-preview' = {
+//   name: guid(currentUserObjectId, contributorRoleDefinitionId)
+//   scope: acr
+//   properties: {
+//     roleDefinitionId: contributorRoleDefinitionId
+//     principalId: currentUserObjectId
+//     principalType: 'User'
+//   }
+// }
 
 resource acrRoleAssignmentForKubelet 'Microsoft.Authorization/roleAssignments@2020-10-01-preview' = {
   name: guid(kubeletIdentity.id, acrPullRoleDefinitionId)
@@ -59,7 +59,7 @@ resource acrRoleAssignmentForAzureDevOps 'Microsoft.Authorization/roleAssignment
   scope: acr
   properties: {
     roleDefinitionId: acrPushRoleDefinitionId
-    principalId: kubeletIdentity.properties.principalId
+    principalId: azureDevOpsObjectId
     principalType: 'ServicePrincipal'
   }
 }
