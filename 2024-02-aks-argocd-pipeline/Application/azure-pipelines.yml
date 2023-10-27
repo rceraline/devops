@@ -26,7 +26,6 @@ stages:
 
         variables:
           applicationFolder: $(Build.Repository.LocalPath)/2024-02-aks-argocd-pipeline/Application/app-01
-          containerRegistry: AzureContainerRegistry
           containerRepository: app-01
           buildConfiguration: "Release"
           deploymentFolder: $(applicationFolder)/deployment
@@ -47,12 +46,12 @@ stages:
             displayName: Login to ACR
             inputs:
               command: login
-              containerRegistry: $(containerRegistry)
+              containerRegistry: AzureContainerRegistry
 
           - task: Docker@2
             displayName: Build Docker image
             inputs:
-              containerRegistry: $(containerRegistry)
+              containerRegistry: AzureContainerRegistry
               repository: $(containerRepository)
               command: "build"
               Dockerfile: $(applicationFolder)/Dockerfile
@@ -65,7 +64,7 @@ stages:
             displayName: Push Docker image
             condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))
             inputs:
-              containerRegistry: $(containerRegistry)
+              containerRegistry: AzureContainerRegistry
               repository: $(containerRepository)
               command: "push"
               tags: |
