@@ -75,7 +75,7 @@ stages:
           - task: CopyFiles@2
             displayName: Copy deployment manifests
             inputs:
-              sourceFolder: ${{ parameters.deploymentFolder }}
+              sourceFolder: $(deploymentFolder)
               contents: "**"
               targetFolder: $(Build.ArtifactStagingDirectory)
               overwrite: true
@@ -93,7 +93,7 @@ stages:
               tokenSuffix: __
 
           - publish: $(Build.ArtifactStagingDirectory)
-            artifact: ${{ parameters.artifactName }}
+            artifact: $(artifactName)
 
   - stage: Staging
     jobs:
