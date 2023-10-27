@@ -9,7 +9,6 @@ resources:
       type: github
       endpoint: rceraline
       name: rceraline/devops-argocd
-      ref: main
 
 variables:
   - name: artifactName
@@ -131,11 +130,11 @@ stages:
                       git config user.email "build@remi-solutions.com"
                       git config user.name "build"
                       git stash
-                      git checkout main
+                      git checkout origin HEAD:main
                       git stash pop
                       git add .
-                      git commit -m "$(componentName): staging deployment"
-                      git push origin
+                      git commit -m "$(componentName): production deployment"
+                      git push origin HEAD:main
 
   - stage: Production
     jobs:
@@ -173,8 +172,8 @@ stages:
                       git config user.email "build@remi-solutions.com"
                       git config user.name "build"
                       git stash
-                      git checkout main
+                      git checkout origin HEAD:main
                       git stash pop
                       git add .
                       git commit -m "$(componentName): production deployment"
-                      git push origin
+                      git push origin HEAD:main
