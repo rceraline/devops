@@ -3,9 +3,6 @@ param location string = resourceGroup().location
 @description('Object ID of the current user.')
 param currentUserObjectId string
 
-@description('Object ID of the Azure DevOps service principal.')
-param azureDevOpsObjectId string
-
 param acrName string = 'cr${uniqueString(resourceGroup().id)}'
 
 var clusterName = 'aks-01'
@@ -34,15 +31,15 @@ resource kubeletIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2021-
   location: location
 }
 
-// resource acrRoleAssignmentForUser 'Microsoft.Authorization/roleAssignments@2020-10-01-preview' = {
-//   name: guid(currentUserObjectId, contributorRoleDefinitionId)
-//   scope: acr
-//   properties: {
-//     roleDefinitionId: contributorRoleDefinitionId
-//     principalId: currentUserObjectId
-//     principalType: 'User'
-//   }
-// }
+resource acrRoleAssignmentForUser 'Microsoft.Authorization/roleAssignments@2020-10-01-preview' = {
+  name: guid(currentUserObjectId, contributorRoleDefinitionId)
+  scope: acr
+  properties: {
+    roleDefinitionId: contributorRoleDefinitionId
+    principalId: currentUserObjectId
+    principalType: 'User'
+  }
+}
 
 resource acrRoleAssignmentForKubelet 'Microsoft.Authorization/roleAssignments@2020-10-01-preview' = {
   name: guid(kubeletIdentity.id, acrPullRoleDefinitionId)
@@ -50,16 +47,6 @@ resource acrRoleAssignmentForKubelet 'Microsoft.Authorization/roleAssignments@20
   properties: {
     roleDefinitionId: acrPullRoleDefinitionId
     principalId: kubeletIdentity.properties.principalId
-    principalType: 'ServicePrincipal'
-  }
-}
-
-resource acrRoleAssignmentForAzureDevOps 'Microsoft.Authorization/roleAssignments@2020-10-01-preview' = {
-  name: guid(azureDevOpsObjectId, acrPushRoleDefinitionId)
-  scope: acr
-  properties: {
-    roleDefinitionId: acrPushRoleDefinitionId
-    principalId: azureDevOpsObjectId
     principalType: 'ServicePrincipal'
   }
 }
