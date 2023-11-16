@@ -27,6 +27,7 @@ stages:
         variables:
           applicationFolder: $(Build.Repository.LocalPath)/2024-02-aks-argocd-pipeline/Application/app-01
           containerRepository: app-01
+          gitUserEmailAddress: build@remi-solutions.com
           buildConfiguration: "Release"
           deploymentFolder: $(applicationFolder)/deployment
           outputFolder: $(applicationFolder)/output/
@@ -127,7 +128,7 @@ stages:
                     targetType: "inline"
                     workingDirectory: $(Build.Repository.LocalPath)
                     script: |
-                      git config user.email "build@remi-solutions.com"
+                      git config user.email "$(gitUserEmailAddress)"
                       git config user.name "build"
                       git stash
                       git remote update
@@ -171,7 +172,7 @@ stages:
                     targetType: "inline"
                     workingDirectory: $(Build.Repository.LocalPath)
                     script: |
-                      git config user.email "build@remi-solutions.com"
+                      git config user.email "$(gitUserEmailAddress)"
                       git config user.name "build"
                       git stash
                       git remote update
