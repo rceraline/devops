@@ -5,7 +5,7 @@ trigger:
 
 resources:
   repositories:
-    - repository: devops-argocd
+    - repository: deployment-repo
       type: github
       endpoint: rceraline
       name: rceraline/devops-argocd
@@ -108,7 +108,7 @@ stages:
           runOnce:
             deploy:
               steps:
-                - checkout: devops-argocd
+                - checkout: deployment-repo
                   persistCredentials: true
                   clean: true
 
@@ -151,7 +151,7 @@ stages:
           runOnce:
             deploy:
               steps:
-                - checkout: devops-argocd
+                - checkout: deployment-repo
                   persistCredentials: true
                   clean: true
 

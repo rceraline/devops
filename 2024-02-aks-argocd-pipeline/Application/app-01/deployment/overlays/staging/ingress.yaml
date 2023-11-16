@@ -1,0 +1,19 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: app-01
+  annotations:
+    appgw.ingress.kubernetes.io/use-private-ip: "true"
+spec:
+  ingressClassName: azure-application-gateway
+  rules:
+    - host: app-01-staging.mycompany.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: app-01
+                port:
+                  number: 80
