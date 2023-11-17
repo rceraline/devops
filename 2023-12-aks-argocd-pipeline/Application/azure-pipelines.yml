@@ -27,7 +27,7 @@ stages:
           vmImage: ubuntu-latest
 
         variables:
-          applicationFolder: $(Build.Repository.LocalPath)/2024-02-aks-argocd-pipeline/Application/app-01
+          applicationFolder: $(Build.Repository.LocalPath)/2023-12-aks-argocd-pipeline/Application/app-01
           containerRepository: app-01
           buildConfiguration: "Release"
           deploymentFolder: $(applicationFolder)/deployment
