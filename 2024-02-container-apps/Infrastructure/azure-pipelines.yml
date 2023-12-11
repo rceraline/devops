@@ -1,0 +1,23 @@
+trigger:
+  branches:
+    include:
+      - main
+  paths:
+    include:
+      - 2024-02-container-apps/Infrastructure
+
+stages:
+  - stage: Deploy
+    jobs:
+      - job: Deploy
+
+        pool:
+          vmImage: ubuntu-latest
+
+        steps:
+          - task: AzureCLI@2
+            inputs:
+              azureSubscription: AzureSubscription
+              scriptType: "pscore"
+              scriptLocation: "scriptPath"
+              scriptPath: $(Build.Repository.LocalPath)/Infrastructure/scripts.ps1

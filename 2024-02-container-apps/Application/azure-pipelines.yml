@@ -1,0 +1,92 @@
+trigger:
+  branches:
+    include:
+      - main
+  paths:
+    include:
+      - 2024-02-container-apps/Application
+
+variables:
+  - name: containerAppName
+    value: app-containerapp20231211
+  - name: containerRegistryUrl
+    value: crcontainerapp20231211.azurecr.io
+  - name: resourceGroupName
+    value: rg-containerapp
+  - name: applicationFolder
+    value: $(Build.Repository.LocalPath)/Application/RemiSolutions
+  - name: containerRepository
+    value: containerapp
+  - name: buildConfiguration
+    value: "Release"
+  - name: outputFolder
+    value: $(applicationFolder)/output/
+
+stages:
+  - stage: Build
+    jobs:
+      - job: Build
+
+        pool:
+          vmImage: ubuntu-latest
+
+        steps:
+          - task: DotNetCoreCLI@2
+            displayName: Build & Publish
+            inputs:
+              command: "publish"
+              publishWebProjects: false
+              modifyOutputPath: false
+              workingDirectory: $(applicationFolder)
+              arguments: --output $(outputFolder) -c $(buildConfiguration) --self-contained true
+              zipAfterPublish: false
+
+          - task: Docker@2
+            displayName: Login to ACR
+            inputs:
+              command: login
+              containerRegistry: AzureContainerRegistry
+
+          - task: Docker@2
+            displayName: Build Docker image
+            inputs:
+              containerRegistry: AzureContainerRegistry
+              repository: $(containerRepository)
+              command: "build"
+              Dockerfile: $(applicationFolder)/Dockerfile
+              buildContext: $(applicationFolder)
+              tags: |
+                $(Build.BuildId)
+                latest
+
+          - task: Docker@2
+            displayName: Push Docker image
+            condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))
+            inputs:
+              containerRegistry: AzureContainerRegistry
+              repository: $(containerRepository)
+              command: "push"
+              tags: |
+                $(Build.BuildId)
+                latest
+
+  - stage: Deploy
+    jobs:
+      - deployment: Deploy
+
+        environment:
+          name: container-app
+
+        pool:
+          vmImage: "ubuntu-latest"
+
+        strategy:
+          runOnce:
+            deploy:
+              steps:
+                - task: AzureContainerApps@1
+                  inputs:
+                    azureSubscription: AzureSubscription
+                    containerAppName: $(containerAppName)
+                    resourceGroup: $(resourceGroupName)
+                    imageToDeploy: $(containerRegistryUrl)/$(containerRepository):$(Build.BuildId)
