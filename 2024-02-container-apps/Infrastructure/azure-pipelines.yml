@@ -21,3 +21,4 @@ stages:
               scriptType: "pscore"
               scriptLocation: "scriptPath"
               scriptPath: $(Build.Repository.LocalPath)/2024-02-container-apps/Infrastructure/script.ps1
+              workingDirectory: $(Build.Repository.LocalPath)/2024-02-container-apps/Infrastructure
