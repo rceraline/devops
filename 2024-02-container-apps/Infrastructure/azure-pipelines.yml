@@ -20,4 +20,4 @@ stages:
               azureSubscription: AzureSubscription
               scriptType: "pscore"
               scriptLocation: "scriptPath"
-              scriptPath: $(Build.Repository.LocalPath)/2024-02-container-apps/Infrastructure/scripts.ps1
+              scriptPath: $(Build.Repository.LocalPath)/2024-02-container-apps/Infrastructure/script.ps1
