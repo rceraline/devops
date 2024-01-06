@@ -1,10 +1,4 @@
-# identity:
-#   userAssignedIdentities:
-#     "/subscriptions/<subscription_id>/resourcegroups/my-rg/providers/Microsoft.ManagedIdentity/userAssignedIdentities/my-user": {}
-#   type: UserAssigned
 properties:
-  # environmentId: "/subscriptions/<subscription_id>/resourceGroups/rg/providers/Microsoft.App/managedEnvironments/demokube"
-  # workloadProfileName: My-GP-01
   configuration:
     ingress:
       external: true

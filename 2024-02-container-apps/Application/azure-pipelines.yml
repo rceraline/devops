@@ -93,6 +93,7 @@ stages:
               tokenSuffix: __
 
           - publish: $(Build.ArtifactStagingDirectory)
+            artifact: "artifacts"
 
   - stage: Deploy
     jobs:
@@ -109,6 +110,8 @@ stages:
             deploy:
               steps:
                 - task: DownloadPipelineArtifact@2
+                  inputs:
+                    artifact: "artifacts"
 
                 - task: AzureContainerApps@1
                   inputs:
