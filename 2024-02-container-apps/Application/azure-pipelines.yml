@@ -15,12 +15,14 @@ variables:
     value: rg-containerapp
   - name: applicationFolder
     value: $(Build.Repository.LocalPath)/Application/RemiSolutions
+  - name: projectFolder
+    value: $(applicationFolder)/RemiSolutions
   - name: containerRepository
     value: containerapp
   - name: buildConfiguration
     value: "Release"
   - name: outputFolder
-    value: $(applicationFolder)/output/
+    value: $(projectFolder)/output/
 
 stages:
   - stage: Build
@@ -37,7 +39,7 @@ stages:
               command: "publish"
               publishWebProjects: false
               modifyOutputPath: false
-              workingDirectory: $(applicationFolder)
+              workingDirectory: $(projectFolder)
               arguments: --output $(outputFolder) -c $(buildConfiguration) --self-contained true
               zipAfterPublish: false
 
@@ -53,8 +55,8 @@ stages:
               containerRegistry: AzureContainerRegistry
               repository: $(containerRepository)
               command: "build"
-              Dockerfile: $(applicationFolder)/Dockerfile
-              buildContext: $(applicationFolder)
+              Dockerfile: $(projectFolder)/Dockerfile
+              buildContext: $(projectFolder)
               tags: |
                 $(Build.BuildId)
                 latest
@@ -73,7 +75,7 @@ stages:
           - task: CopyFiles@2
             displayName: Copy deployment yaml file
             inputs:
-              sourceFolder: $(Build.Repository.LocalPath)/2024-02-container-apps/Application
+              sourceFolder: $(applicationFolder)
               contents: "deployment.yaml"
               targetFolder: $(Build.ArtifactStagingDirectory)
               overwrite: true
