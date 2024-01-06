@@ -1,0 +1,28 @@
+# identity:
+#   userAssignedIdentities:
+#     "/subscriptions/<subscription_id>/resourcegroups/my-rg/providers/Microsoft.ManagedIdentity/userAssignedIdentities/my-user": {}
+#   type: UserAssigned
+properties:
+  # environmentId: "/subscriptions/<subscription_id>/resourceGroups/rg/providers/Microsoft.App/managedEnvironments/demokube"
+  # workloadProfileName: My-GP-01
+  configuration:
+    ingress:
+      external: true
+      targetPort: 80
+  template:
+    containers:
+      - image: __containerRegistryUrl__/__containerRepository__:__Build.BuildId__
+        name: __containerAppName__
+        probes:
+          - type: Liveness
+            httpGet:
+              path: "/healthz"
+              port: 80
+            initialDelaySeconds: 3
+            periodSeconds: 3
+          - type: Readiness
+            httpGet:
+              path: "/healthz"
+              port: 80
+            initialDelaySeconds: 3
+            periodSeconds: 3

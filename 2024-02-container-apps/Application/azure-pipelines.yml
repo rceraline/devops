@@ -70,6 +70,28 @@ stages:
                 $(Build.BuildId)
                 latest
 
+          - task: CopyFiles@2
+            displayName: Copy deployment yaml file
+            inputs:
+              sourceFolder: $(Build.Repository.LocalPath)/2024-02-container-apps/Application
+              contents: "deployment.yaml"
+              targetFolder: $(Build.ArtifactStagingDirectory)
+              overwrite: true
+
+          - task: qetza.replacetokens.replacetokens-task.replacetokens@3
+            displayName: Replace tokens
+            inputs:
+              rootDirectory: $(Build.ArtifactStagingDirectory)
+              targetFiles: "deployment.yaml"
+              encoding: auto
+              writeBOM: true
+              escapeType: no escaping
+              actionOnMissing: log warning
+              tokenPrefix: __
+              tokenSuffix: __
+
+          - publish: $(Build.ArtifactStagingDirectory)
+
   - stage: Deploy
     jobs:
       - deployment: Deploy
@@ -84,9 +106,11 @@ stages:
           runOnce:
             deploy:
               steps:
+                - task: DownloadPipelineArtifact@2
+
                 - task: AzureContainerApps@1
                   inputs:
                     azureSubscription: AzureSubscription
                     containerAppName: $(containerAppName)
                     resourceGroup: $(resourceGroupName)
-                    imageToDeploy: $(containerRegistryUrl)/$(containerRepository):$(Build.BuildId)
+                    yamlConfigPath: $(Pipeline.Workspace)/deployment.yaml
