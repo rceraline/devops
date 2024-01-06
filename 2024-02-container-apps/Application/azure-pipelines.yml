@@ -14,7 +14,7 @@ variables:
   - name: resourceGroupName
     value: rg-containerapp
   - name: applicationFolder
-    value: $(Build.Repository.LocalPath)/Application/RemiSolutions
+    value: $(Build.Repository.LocalPath)/2024-02-container-apps/Application
   - name: projectFolder
     value: $(applicationFolder)/RemiSolutions
   - name: containerRepository
