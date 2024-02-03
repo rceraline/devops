@@ -41,11 +41,6 @@ resource kubeletIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2021-
   location: location
 }
 
-resource agwIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2021-09-30-preview' = {
-  name: 'id-agw-01'
-  location: location
-}
-
 resource acrRoleAssignmentForUser 'Microsoft.Authorization/roleAssignments@2020-10-01-preview' = {
   name: guid(currentUserObjectId, contributorRoleDefinitionId)
   scope: acr
