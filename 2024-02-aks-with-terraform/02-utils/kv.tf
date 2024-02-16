@@ -12,7 +12,7 @@ resource "azurerm_key_vault" "kv" {
   sku_name = "premium"
 
   enable_rbac_authorization     = true
-  public_network_access_enabled = true
+  public_network_access_enabled = false
 }
 
 resource "azurerm_private_endpoint" "kv" {
