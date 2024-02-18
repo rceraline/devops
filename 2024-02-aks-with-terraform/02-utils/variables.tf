@@ -1,6 +1,6 @@
-variable "key_vault_crypto_officer_id" {
+variable "key_vault_certificate_officer_id" {
   type        = string
-  description = "ID of the user who need Key Vault Certificates Officer role on the key vault."
+  description = "ID of the user who need to manage certificates."
 }
 
 variable "vm_password" {
