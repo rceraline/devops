@@ -38,3 +38,9 @@ data "azurerm_private_dns_zone" "kv" {
   name                = "privatelink.vaultcore.azure.net"
   resource_group_name = data.azurerm_resource_group.rg_01.name
 }
+
+resource "azurerm_role_assignment" "crypto_officer" {
+  scope                = azurerm_key_vault.kv.id
+  role_definition_name = "Key Vault Certificates Officer"
+  principal_id         = var.key_vault_crypto_officer_id
+}
