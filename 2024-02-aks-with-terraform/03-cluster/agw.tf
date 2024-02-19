@@ -87,6 +87,16 @@ resource "azurerm_application_gateway" "agw_01" {
     backend_http_settings_name = local.http_setting_name
   }
 
+  identity {
+    type         = "UserAssigned"
+    identity_ids = [azurerm_user_assigned_identity.agw_01.id]
+  }
+
+  ssl_certificate {
+    name                = "cert-website-com"
+    key_vault_secret_id = "https://kv-20240207.vault.azure.net/secrets/cert-website-com"
+  }
+
   lifecycle {
     ignore_changes = [
       tags,
@@ -99,4 +109,23 @@ resource "azurerm_application_gateway" "agw_01" {
       request_routing_rule
     ]
   }
+
+  depends_on = [azurerm_role_assignment.agw]
+}
+
+resource "azurerm_user_assigned_identity" "agw_01" {
+  location            = data.azurerm_resource_group.rg_01.location
+  name                = "id-agw-01"
+  resource_group_name = data.azurerm_resource_group.rg_01.name
+}
+
+resource "azurerm_role_assignment" "agw" {
+  scope                = data.azurerm_key_vault.kv.id
+  role_definition_name = "Key Vault Secrets User"
+  principal_id         = azurerm_user_assigned_identity.agw_01.principal_id
+}
+
+data "azurerm_key_vault" "kv" {
+  name                = "kv-20240207"
+  resource_group_name = data.azurerm_resource_group.rg_01.name
 }
