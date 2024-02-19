@@ -1,10 +1,3 @@
-data "azurerm_subnet" "agw_01" {
-  name                 = "snet-agw-01"
-  virtual_network_name = "vnet-aks-01"
-  resource_group_name  = data.azurerm_resource_group.rg_01.name
-}
-
-
 resource "azurerm_public_ip" "pip_02" {
   name                = "pip-02"
   resource_group_name = data.azurerm_resource_group.rg_01.name
@@ -128,9 +121,4 @@ resource "azurerm_role_assignment" "agw_secret_user" {
   scope                = data.azurerm_key_vault.kv.id
   role_definition_name = "Key Vault Secrets User"
   principal_id         = azurerm_user_assigned_identity.agw_01.principal_id
-}
-
-data "azurerm_key_vault" "kv" {
-  name                = "kv-20240207"
-  resource_group_name = data.azurerm_resource_group.rg_01.name
 }
