@@ -17,4 +17,6 @@ resource "azurerm_key_vault_key" "kms" {
     "decrypt",
     "encrypt"
   ]
+
+  depends_on = [azurerm_role_assignment.crypto_officer]
 }
