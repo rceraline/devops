@@ -41,6 +41,7 @@ resource "azurerm_subnet" "agw_01" {
   resource_group_name  = azurerm_resource_group.rg_01.name
   virtual_network_name = azurerm_virtual_network.aks_01.name
   address_prefixes     = ["10.1.0.0/24"]
+  service_endpoints    = ["Microsoft.KeyVault"]
 }
 
 resource "azurerm_subnet" "utils_01" {
@@ -48,6 +49,7 @@ resource "azurerm_subnet" "utils_01" {
   resource_group_name  = azurerm_resource_group.rg_01.name
   virtual_network_name = azurerm_virtual_network.aks_01.name
   address_prefixes     = ["10.1.1.0/24"]
+  service_endpoints    = ["Microsoft.KeyVault"]
 }
 
 resource "azurerm_subnet" "aks_01" {
@@ -55,5 +57,6 @@ resource "azurerm_subnet" "aks_01" {
   resource_group_name  = azurerm_resource_group.rg_01.name
   virtual_network_name = azurerm_virtual_network.aks_01.name
   address_prefixes     = ["10.1.2.0/24"]
+  service_endpoints    = ["Microsoft.KeyVault"]
 }
 

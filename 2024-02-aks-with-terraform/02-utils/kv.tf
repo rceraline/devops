@@ -12,16 +12,7 @@ resource "azurerm_key_vault" "kv" {
   sku_name = "premium"
 
   enable_rbac_authorization     = true
-  public_network_access_enabled = true
-
-  network_acls {
-    bypass         = "AzureServices"
-    default_action = "Deny"
-    virtual_network_subnet_ids = [
-      data.azurerm_subnet.agw_01.id,
-      data.azurerm_subnet.utils_01.id
-    ]
-  }
+  public_network_access_enabled = false
 }
 
 resource "azurerm_private_endpoint" "kv" {

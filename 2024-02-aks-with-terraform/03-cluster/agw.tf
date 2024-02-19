@@ -97,6 +97,13 @@ resource "azurerm_application_gateway" "agw_01" {
     key_vault_secret_id = "https://kv-20240207.vault.azure.net/secrets/cert-website-com"
   }
 
+  ssl_policy {
+    policy_type = "Predefined"
+    policy_name = "AppGwSslPolicy20220101S"
+  }
+
+  depends_on = [azurerm_role_assignment.agw_secret_user]
+
   lifecycle {
     ignore_changes = [
       tags,
@@ -109,8 +116,6 @@ resource "azurerm_application_gateway" "agw_01" {
       request_routing_rule
     ]
   }
-
-  depends_on = [azurerm_role_assignment.agw]
 }
 
 resource "azurerm_user_assigned_identity" "agw_01" {
@@ -119,7 +124,7 @@ resource "azurerm_user_assigned_identity" "agw_01" {
   resource_group_name = data.azurerm_resource_group.rg_01.name
 }
 
-resource "azurerm_role_assignment" "agw" {
+resource "azurerm_role_assignment" "agw_secret_user" {
   scope                = data.azurerm_key_vault.kv.id
   role_definition_name = "Key Vault Secrets User"
   principal_id         = azurerm_user_assigned_identity.agw_01.principal_id
