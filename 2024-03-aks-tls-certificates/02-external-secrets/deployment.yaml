@@ -1,0 +1,64 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: app-01
+  name: app-01
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: app-01
+  template:
+    metadata:
+      labels:
+        app: app-01
+    spec:
+      containers:
+        - name: app-01
+          image: crpunjt2filcllc.azurecr.io/app-01:01
+          ports:
+            - containerPort: 8080
+          resources:
+            limits:
+              memory: "512Mi"
+              cpu: "256m"
+            requests:
+              memory: "256Mi"
+              cpu: "128m"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: app-01
+spec:
+  type: ClusterIP
+  ports:
+    - port: 80
+      targetPort: 8080
+  selector:
+    app: app-01
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: app-01
+  annotations:
+    appgw.ingress.kubernetes.io/ssl-redirect: "true"
+    appgw.ingress.kubernetes.io/appgw-ssl-certificate: "my-certificate"
+spec:
+  ingressClassName: azure-application-gateway
+  tls:
+    - hosts:
+        - mywebsite.local
+  rules:
+    - host: mywebsite.local
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: app-01
+                port:
+                  number: 80

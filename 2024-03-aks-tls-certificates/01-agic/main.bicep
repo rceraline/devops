@@ -10,7 +10,6 @@ param kvName string = 'kv-${uniqueString(resourceGroup().id)}'
 var clusterName = 'aks-01'
 var vmSize = 'Standard_D2s_v3'
 var applicationGatewayName = 'agw-01'
-var zoneName = 'mywebsite.local'
 
 var acrPullRoleDefinitionId = resourceId('Microsoft.Authorization/roleDefinitions', '7f951dda-4ed3-4680-a7ca-43fe172d538d')
 var contributorRoleDefinitionId = resourceId('Microsoft.Authorization/roleDefinitions', 'b24988ac-6180-42a0-ab88-20f7382dd24c')
