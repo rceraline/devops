@@ -18,7 +18,7 @@ spec:
         - name: app-01
           image: crpunjt2filcllc.azurecr.io/app-01:01
           ports:
-            - containerPort: 80
+            - containerPort: 8080
           resources:
             limits:
               memory: "512Mi"
@@ -35,6 +35,7 @@ spec:
   type: ClusterIP
   ports:
     - port: 80
+      targetPort: 8080
   selector:
     app: app-01
 ---
@@ -43,14 +44,15 @@ kind: Ingress
 metadata:
   name: app-01
   annotations:
+    appgw.ingress.kubernetes.io/ssl-redirect: "true"
     appgw.ingress.kubernetes.io/appgw-ssl-certificate: "my-certificate"
 spec:
   ingressClassName: azure-application-gateway
   tls:
     - hosts:
-        - www.mywebsite.local
+        - mywebsite.local
   rules:
-    - host: www.mywebsite.local
+    - host: mywebsite.local
       http:
         paths:
           - path: /

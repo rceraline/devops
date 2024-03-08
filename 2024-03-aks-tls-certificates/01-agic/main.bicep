@@ -316,22 +316,4 @@ resource aks 'Microsoft.ContainerService/managedClusters@2023-06-02-preview' = {
   ]
 }
 
-resource zone 'Microsoft.Network/dnsZones@2018-05-01' = {
-  name: zoneName
-  location: 'global'
-}
-
-resource record 'Microsoft.Network/dnsZones/A@2018-05-01' = {
-  parent: zone
-  name: 'www'
-  properties: {
-    TTL: 3600
-    ARecords: [
-      {
-        ipv4Address: publicIPAddress.properties.ipAddress
-      }
-    ]
-  }
-}
-
 output acrUrl string = '${acr.name}.azurecr.io'
