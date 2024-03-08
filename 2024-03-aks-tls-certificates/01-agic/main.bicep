@@ -102,7 +102,7 @@ resource controlPlaneIdentityOperatorRoleAssignment 'Microsoft.Authorization/rol
   }
 }
 
-resource acrRoleAssignmentForUser 'Microsoft.Authorization/roleAssignments@2020-10-01-preview' = {
+resource currentUserRoleAssignmentForAcr 'Microsoft.Authorization/roleAssignments@2020-10-01-preview' = {
   name: guid(currentUserObjectId, contributorRoleDefinitionId)
   scope: acr
   properties: {
@@ -112,7 +112,7 @@ resource acrRoleAssignmentForUser 'Microsoft.Authorization/roleAssignments@2020-
   }
 }
 
-resource acrRoleAssignmentForKubelet 'Microsoft.Authorization/roleAssignments@2020-10-01-preview' = {
+resource kubeletRoleAssignmentForAcr 'Microsoft.Authorization/roleAssignments@2020-10-01-preview' = {
   name: guid(kubeletIdentity.id, acrPullRoleDefinitionId)
   scope: acr
   properties: {
@@ -122,7 +122,7 @@ resource acrRoleAssignmentForKubelet 'Microsoft.Authorization/roleAssignments@20
   }
 }
 
-resource kvRoleAssignmentForUser 'Microsoft.Authorization/roleAssignments@2020-10-01-preview' = {
+resource currentUserRoleAssignmentForKeyVault 'Microsoft.Authorization/roleAssignments@2020-10-01-preview' = {
   name: guid(currentUserObjectId, kvCertificateOfficerRoleDefinitionId)
   scope: kv
   properties: {
@@ -132,7 +132,7 @@ resource kvRoleAssignmentForUser 'Microsoft.Authorization/roleAssignments@2020-1
   }
 }
 
-resource kvRoleAssignmentForApplicationGateway 'Microsoft.Authorization/roleAssignments@2020-10-01-preview' = {
+resource applicationGatewayRoleAssignmentForKeyVault 'Microsoft.Authorization/roleAssignments@2020-10-01-preview' = {
   name: guid(applicationGatewayIdentity.id, kvSecretUserRoleDefinitionId)
   scope: kv
   properties: {
@@ -142,7 +142,7 @@ resource kvRoleAssignmentForApplicationGateway 'Microsoft.Authorization/roleAssi
   }
 }
 
-resource applicationGatewayRoleAssignmentForAgic 'Microsoft.Authorization/roleAssignments@2020-10-01-preview' = {
+resource agicRoleAssignmentForResourceGroup 'Microsoft.Authorization/roleAssignments@2020-10-01-preview' = {
   name: guid(aks.id, 'agic', contributorRoleDefinitionId)
   scope: resourceGroup()
   properties: {
