@@ -90,6 +90,10 @@ resource "azurerm_kubernetes_cluster" "aks-01" {
     azure_rbac_enabled     = true
   }
 
+  oms_agent {
+    log_analytics_workspace_id = azurerm_log_analytics_workspace.log.id
+  }
+
   depends_on = [
     azurerm_role_assignment.controlplane_identity_contributor,
     azurerm_role_assignment.controlplane_keyvault_crypto_user,
