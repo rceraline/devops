@@ -91,7 +91,8 @@ resource "azurerm_kubernetes_cluster" "aks-01" {
   }
 
   oms_agent {
-    log_analytics_workspace_id = azurerm_log_analytics_workspace.log.id
+    log_analytics_workspace_id      = azurerm_log_analytics_workspace.log.id
+    msi_auth_for_monitoring_enabled = true
   }
 
   depends_on = [
