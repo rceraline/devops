@@ -3,6 +3,11 @@ variable "cluster_admin_ids" {
   description = "List of cluster admin IDs."
 }
 
+variable "grafana_admin_id" {
+  type = string
+  description = "Group or user ID of the grafana admin."
+}
+
 variable "data_collection_interval" {
   default = "1m"
 }

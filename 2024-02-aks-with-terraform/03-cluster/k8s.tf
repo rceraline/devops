@@ -95,6 +95,11 @@ resource "azurerm_kubernetes_cluster" "aks_01" {
     msi_auth_for_monitoring_enabled = true
   }
 
+  monitor_metrics {
+    annotations_allowed = null
+    labels_allowed      = null
+  }
+
   depends_on = [
     azurerm_role_assignment.controlplane_identity_contributor,
     azurerm_role_assignment.controlplane_keyvault_crypto_user,
