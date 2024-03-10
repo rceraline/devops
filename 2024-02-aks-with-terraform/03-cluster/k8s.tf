@@ -37,10 +37,10 @@ resource "azurerm_role_assignment" "kubelet_acrpull" {
 resource "azurerm_role_assignment" "agic" {
   scope                = data.azurerm_resource_group.rg_01.id
   role_definition_name = "Contributor"
-  principal_id         = azurerm_kubernetes_cluster.aks-01.ingress_application_gateway[0].ingress_application_gateway_identity[0].object_id
+  principal_id         = azurerm_kubernetes_cluster.aks_01.ingress_application_gateway[0].ingress_application_gateway_identity[0].object_id
 }
 
-resource "azurerm_kubernetes_cluster" "aks-01" {
+resource "azurerm_kubernetes_cluster" "aks_01" {
   name                       = "aks-01"
   location                   = data.azurerm_resource_group.rg_01.location
   resource_group_name        = data.azurerm_resource_group.rg_01.name
@@ -100,4 +100,47 @@ resource "azurerm_kubernetes_cluster" "aks-01" {
     azurerm_role_assignment.controlplane_keyvault_crypto_user,
     azurerm_role_assignment.controlplane_resourcegroup_contributor
   ]
+}
+
+resource "azurerm_monitor_data_collection_rule" "dcr_container_insights" {
+  name                = "MSCI--${azurerm_kubernetes_cluster.aks_01.name}"
+  resource_group_name = data.azurerm_resource_group.rg_01.name
+  location            = data.azurerm_resource_group.rg_01.location
+
+  destinations {
+    log_analytics {
+      workspace_resource_id = azurerm_log_analytics_workspace.log.id
+      name                  = "ciworkspace"
+    }
+  }
+
+  data_flow {
+    streams      = var.streams
+    destinations = ["ciworkspace"]
+  }
+
+  data_sources {
+    extension {
+      streams        = var.streams
+      extension_name = "ContainerInsights"
+      extension_json = jsonencode({
+        "dataCollectionSettings" : {
+          "interval" : var.data_collection_interval,
+          "namespaceFilteringMode" : var.namespace_filtering_mode_for_data_collection,
+          "namespaces" : var.namespaces_for_data_collection
+          "enableContainerLogV2" : var.enableContainerLogV2
+        }
+      })
+      name = "ContainerInsightsExtension"
+    }
+  }
+
+  description = "DCR for Azure Monitor Container Insights"
+}
+
+resource "azurerm_monitor_data_collection_rule_association" "dcra_container_insights" {
+  name                    = "ContainerInsightsExtension"
+  target_resource_id      = azurerm_kubernetes_cluster.aks_01.id
+  data_collection_rule_id = azurerm_monitor_data_collection_rule.dcr_container_insights.id
+  description             = "Association of container insights data collection rule. Deleting this association will break the data collection for this AKS Cluster."
 }
