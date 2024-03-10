@@ -44,13 +44,13 @@ kind: Ingress
 metadata:
   name: app-01
   annotations:
-    appgw.ingress.kubernetes.io/ssl-redirect: "true"
-    appgw.ingress.kubernetes.io/appgw-ssl-certificate: "my-certificate"
+    nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
 spec:
-  ingressClassName: azure-application-gateway
+  ingressClassName: nginx
   tls:
     - hosts:
         - mywebsite.local
+      secretName: my-certificate
   rules:
     - host: mywebsite.local
       http:
@@ -62,3 +62,36 @@ spec:
                 name: app-01
                 port:
                   number: 80
+---
+apiVersion: external-secrets.io/v1beta1
+kind: SecretStore
+metadata:
+  name: azure-store
+spec:
+  provider:
+    azurekv:
+      authType: WorkloadIdentity
+      vaultUrl: "https://kv-punjt2filcllc.vault.azure.net"
+      serviceAccountRef:
+        name: sa-workload-01
+---
+apiVersion: external-secrets.io/v1beta1
+kind: ExternalSecret
+metadata:
+  name: my-certificate
+spec:
+  refreshInterval: 1h
+  secretStoreRef:
+    kind: SecretStore
+    name: azure-store
+  target:
+    template:
+      type: kubernetes.io/tls
+      engineVersion: v2
+      data:
+        tls.crt: "{{ .tls | b64dec | pkcs12cert }}"
+        tls.key: "{{ .tls | b64dec | pkcs12key }}"
+  data:
+    - secretKey: tls
+      remoteRef:
+        key: secret/my-certificate
