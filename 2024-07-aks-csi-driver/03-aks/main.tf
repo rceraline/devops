@@ -43,6 +43,7 @@ resource "azurerm_kubernetes_cluster" "aks" {
   # private_dns_zone_id    = data.azurerm_private_dns_zone.aks.id
   local_account_disabled = true
   sku_tier               = "Standard"
+  oidc_issuer_enabled    = true
 
   default_node_pool {
     name           = "default"
@@ -72,6 +73,10 @@ resource "azurerm_kubernetes_cluster" "aks" {
     managed                = true
     admin_group_object_ids = var.cluster_admin_ids
     azure_rbac_enabled     = true
+  }
+
+  key_vault_secrets_provider {
+    secret_rotation_enabled = true
   }
 
   depends_on = [
