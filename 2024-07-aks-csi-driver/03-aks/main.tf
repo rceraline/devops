@@ -84,3 +84,16 @@ resource "azurerm_kubernetes_cluster" "aks" {
     azurerm_role_assignment.controlplane_resourcegroup_contributor
   ]
 }
+
+##### CSI Driver identity
+resource "azurerm_user_assigned_identity" "workload_identity" {
+  location            = data.azurerm_resource_group.rg.location
+  name                = "id-csi-driver-workloadidentity-01"
+  resource_group_name = data.azurerm_resource_group.rg.name
+}
+
+resource "azurerm_role_assignment" "secret_user" {
+  scope                = data.azurerm_key_vault.kv.id
+  role_definition_name = "Key Vault Secrets User"
+  principal_id         = azurerm_user_assigned_identity.workload_identity.principal_id
+}

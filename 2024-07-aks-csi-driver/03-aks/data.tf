@@ -29,4 +29,9 @@ data "azurerm_container_registry" "cr" {
   resource_group_name = data.azurerm_resource_group.rg.name
 }
 
+data "azurerm_key_vault" "kv" {
+  name                = "kv-2024070102"
+  resource_group_name = data.azurerm_resource_group.rg.name
+}
+
 data "azurerm_client_config" "current" {}

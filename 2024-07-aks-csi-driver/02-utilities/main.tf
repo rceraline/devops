@@ -40,11 +40,11 @@ resource "azurerm_key_vault" "kv" {
   sku_name = "premium"
 
   enable_rbac_authorization     = true
-  public_network_access_enabled = false
+  public_network_access_enabled = true
 
   network_acls {
     bypass         = "AzureServices"
-    default_action = "Deny"
+    default_action = "Allow"
   }
 }
 
@@ -70,4 +70,10 @@ resource "azurerm_private_endpoint" "kv" {
 data "azurerm_private_dns_zone" "kv" {
   name                = "privatelink.vaultcore.azure.net"
   resource_group_name = data.azurerm_resource_group.rg.name
+}
+
+resource "azurerm_role_assignment" "keyvault_administrator" {
+  scope                = azurerm_key_vault.kv.id
+  role_definition_name = "Key Vault Administrator"
+  principal_id         = data.azurerm_client_config.current.object_id
 }
