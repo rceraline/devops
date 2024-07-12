@@ -1,13 +1,60 @@
+### Resource group
+resource "azurerm_resource_group" "rg" {
+  name     = "rg-csi-driver-01"
+  location = "Canada Central"
+}
+
+### Network
+resource "azurerm_virtual_network" "vnet" {
+  name                = "vnet-csi-driver-01"
+  location            = azurerm_resource_group.rg.location
+  resource_group_name = azurerm_resource_group.rg.name
+  address_space       = ["10.0.0.0/16"]
+}
+
+resource "azurerm_subnet" "aks" {
+  name                 = "snet-aks-01"
+  resource_group_name  = azurerm_resource_group.rg.name
+  virtual_network_name = azurerm_virtual_network.vnet.name
+  address_prefixes     = ["10.0.0.0/24"]
+  service_endpoints    = ["Microsoft.KeyVault"]
+}
+
+### ACR
+resource "azurerm_container_registry" "cr" {
+  name                = "cr20240701"
+  resource_group_name = azurerm_resource_group.rg.name
+  location            = azurerm_resource_group.rg.location
+  sku                 = "Basic"
+  admin_enabled       = false
+}
+
+### Key vault
+resource "azurerm_key_vault" "kv" {
+  name                        = "kv-2024070102"
+  location                    = azurerm_resource_group.rg.location
+  resource_group_name         = azurerm_resource_group.rg.name
+  enabled_for_disk_encryption = true
+  tenant_id                   = data.azurerm_client_config.current.tenant_id
+  soft_delete_retention_days  = 7
+  purge_protection_enabled    = false
+
+  sku_name = "standard"
+
+  enable_rbac_authorization = true
+}
+
+### AKS
 resource "azurerm_user_assigned_identity" "controlplane" {
-  location            = data.azurerm_resource_group.rg.location
+  location            = azurerm_resource_group.rg.location
   name                = "id-csi-driver-controlplane-01"
-  resource_group_name = data.azurerm_resource_group.rg.name
+  resource_group_name = azurerm_resource_group.rg.name
 }
 
 resource "azurerm_user_assigned_identity" "kubelet" {
-  location            = data.azurerm_resource_group.rg.location
+  location            = azurerm_resource_group.rg.location
   name                = "id-csi-driver-kubelet-01"
-  resource_group_name = data.azurerm_resource_group.rg.name
+  resource_group_name = azurerm_resource_group.rg.name
 }
 
 resource "azurerm_role_assignment" "controlplane_identity_contributor" {
@@ -17,13 +64,13 @@ resource "azurerm_role_assignment" "controlplane_identity_contributor" {
 }
 
 resource "azurerm_role_assignment" "controlplane_resourcegroup_contributor" {
-  scope                = data.azurerm_resource_group.rg.id
+  scope                = azurerm_resource_group.rg.id
   role_definition_name = "Contributor"
   principal_id         = azurerm_user_assigned_identity.controlplane.principal_id
 }
 
 resource "azurerm_role_assignment" "kubelet_acrpull" {
-  scope                = data.azurerm_container_registry.cr.id
+  scope                = azurerm_container_registry.cr.id
   role_definition_name = "AcrPull"
   principal_id         = azurerm_user_assigned_identity.kubelet.principal_id
 }
@@ -35,21 +82,20 @@ resource "azurerm_role_assignment" "cluster_admin" {
 }
 
 resource "azurerm_kubernetes_cluster" "aks" {
-  name                = "aks-csi-driver-01"
-  location            = data.azurerm_resource_group.rg.location
-  resource_group_name = data.azurerm_resource_group.rg.name
-  dns_prefix          = "aks-csi-driver-01"
-  kubernetes_version  = "1.28"
-  # private_dns_zone_id    = data.azurerm_private_dns_zone.aks.id
+  name                   = "aks-csi-driver-01"
+  location               = azurerm_resource_group.rg.location
+  resource_group_name    = azurerm_resource_group.rg.name
+  dns_prefix             = "aks-csi-driver-01"
+  kubernetes_version     = "1.30"
   local_account_disabled = true
-  sku_tier               = "Standard"
+  sku_tier               = "Free"
   oidc_issuer_enabled    = true
 
   default_node_pool {
     name           = "default"
     node_count     = 1
     vm_size        = "Standard_D2s_v3"
-    vnet_subnet_id = data.azurerm_subnet.aks.id
+    vnet_subnet_id = azurerm_subnet.aks.id
   }
 
   identity {
@@ -85,15 +131,15 @@ resource "azurerm_kubernetes_cluster" "aks" {
   ]
 }
 
-##### CSI Driver identity
+### CSI Driver identity
 resource "azurerm_user_assigned_identity" "workload_identity" {
-  location            = data.azurerm_resource_group.rg.location
+  location            = azurerm_resource_group.rg.location
   name                = "id-csi-driver-workloadidentity-01"
-  resource_group_name = data.azurerm_resource_group.rg.name
+  resource_group_name = azurerm_resource_group.rg.name
 }
 
 resource "azurerm_role_assignment" "secret_user" {
-  scope                = data.azurerm_key_vault.kv.id
+  scope                = azurerm_key_vault.kv.id
   role_definition_name = "Key Vault Secrets User"
   principal_id         = azurerm_user_assigned_identity.workload_identity.principal_id
 }
