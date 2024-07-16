@@ -17,7 +17,6 @@ resource "azurerm_subnet" "aks" {
   resource_group_name  = azurerm_resource_group.rg.name
   virtual_network_name = azurerm_virtual_network.vnet.name
   address_prefixes     = ["10.0.0.0/24"]
-  service_endpoints    = ["Microsoft.KeyVault"]
 }
 
 ### ACR
@@ -44,7 +43,7 @@ resource "azurerm_key_vault" "kv" {
   enable_rbac_authorization = true
 }
 
-### AKS
+### Identities
 resource "azurerm_user_assigned_identity" "controlplane" {
   location            = azurerm_resource_group.rg.location
   name                = "id-csi-driver-controlplane-01"
@@ -81,6 +80,7 @@ resource "azurerm_role_assignment" "cluster_admin" {
   principal_id         = data.azurerm_client_config.current.object_id
 }
 
+### AKS
 resource "azurerm_kubernetes_cluster" "aks" {
   name                   = "aks-csi-driver-01"
   location               = azurerm_resource_group.rg.location
