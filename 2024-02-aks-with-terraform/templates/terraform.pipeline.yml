@@ -89,7 +89,7 @@ stages:
                   displayName: terraform apply
                   inputs:
                     command: "apply"
-                    commandOptions: '-input=false "${{ parameters.planName }}" ${{ parameters.terraformExtraCommandOptions }}'
+                    commandOptions: '-input=false "${{ parameters.planName }}"'
                     backendType: "azurerm"
                     workingDirectory: ${{ parameters.publishedArtifactsDirectory }}
                     environmentServiceName: ${{ parameters.serviceConnection }}
