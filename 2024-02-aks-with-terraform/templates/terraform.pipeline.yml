@@ -4,18 +4,17 @@ parameters:
   - name: target
     default: $(build.artifactstagingdirectory)
   - name: publishedArtifactsDirectory
-    default: $(Pipeline.Workspace)/${{ parameters.artifactName }}
+    default: $(Pipeline.Workspace)/terraform
   - name: planName
     default: tfplan
   - name: serviceConnection
   - name: buildAgent
   - name: terraformDir
 
-pool:
-  vmImage: ${{ parameters.buildAgent }}
-
 stages:
   - stage: Plan
+    pool:
+      vmImage: ${{ parameters.buildAgent }}
     jobs:
       - job: Plan
         steps:
@@ -62,11 +61,11 @@ stages:
   - stage: Deploy
     displayName: Deploy
     condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))
+    pool:
+      vmImage: ${{ parameters.buildAgent }}
     jobs:
       - deployment: Deploy
         environment: Azure
-        pool:
-          vmImage: ${{ parameters.buildAgent }}
         strategy:
           runOnce:
             deploy:
