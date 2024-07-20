@@ -1,6 +1,8 @@
 parameters:
   - name: artifactName
     default: terraform
+  - name: environment
+    default: Azure
   - name: target
     default: $(build.artifactstagingdirectory)
   - name: publishedArtifactsDirectory
@@ -65,7 +67,7 @@ stages:
       vmImage: ${{ parameters.buildAgent }}
     jobs:
       - deployment: Deploy
-        environment: Azure
+        environment: ${{ parameters.environment }}
         strategy:
           runOnce:
             deploy:
