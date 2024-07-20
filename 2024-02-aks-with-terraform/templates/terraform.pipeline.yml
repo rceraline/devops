@@ -1,0 +1,92 @@
+parameters:
+  - name: artifactName
+    default: terraform
+  - name: target
+    default: $(build.artifactstagingdirectory)
+  - name: publishedArtifactsDirectory
+    default: $(Pipeline.Workspace)/${{ parameters.artifactName }}
+  - name: planName
+    default: tfplan
+  - name: serviceConnection
+  - name: buildAgent
+  - name: terraformDir
+
+pool:
+  vmImage: ${{ parameters.buildAgent }}
+
+stages:
+  - stage: Plan
+    jobs:
+      - job: Plan
+        steps:
+          - task: TerraformCLI@1
+            displayName: terraform init
+            inputs:
+              command: "init"
+              backendType: "azurerm"
+              workingDirectory: ${{ parameters.terraformDir }}
+              backendServiceArm: ${{ parameters.serviceConnection }}
+
+          - task: TerraformCLI@1
+            displayName: terraform validate
+            inputs:
+              command: "validate"
+              backendType: "azurerm"
+              workingDirectory: ${{ parameters.terraformDir }}
+              environmentServiceName: ${{ parameters.serviceConnection }}
+
+          - task: TerraformCLI@1
+            displayName: terraform plan
+            inputs:
+              command: "plan"
+              backendType: "azurerm"
+              workingDirectory: ${{ parameters.terraformDir }}
+              commandOptions: "-input=false -out=${{ parameters.planName }}"
+              environmentServiceName: ${{ parameters.serviceConnection }}
+              publishPlanResults: "Terraform plan"
+
+          - task: CopyFiles@2
+            displayName: Copy files
+            inputs:
+              SourceFolder: ${{ parameters.terraformDir }}
+              Contents: |
+                .terraform.lock.hcl
+                **/*.tf
+                **/*.tfvars
+                **/*tfplan*
+              TargetFolder: ${{ parameters.target }}
+
+          - publish: ${{ parameters.target }}
+            artifact: ${{ parameters.artifactName }}
+
+  - stage: Deploy
+    displayName: Deploy
+    condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))
+    jobs:
+      - deployment: Deploy
+        environment: Azure
+        pool:
+          vmImage: ${{ parameters.buildAgent }}
+        strategy:
+          runOnce:
+            deploy:
+              steps:
+                - download: "current"
+                  artifact: ${{ parameters.artifactName }}
+
+                - task: TerraformCLI@1
+                  displayName: terraform init
+                  inputs:
+                    command: "init"
+                    backendType: "azurerm"
+                    workingDirectory: ${{ parameters.publishedArtifactsDirectory }}
+                    backendServiceArm: ${{ parameters.serviceConnection }}
+
+                - task: TerraformCLI@1
+                  displayName: terraform apply
+                  inputs:
+                    command: "apply"
+                    commandOptions: '-input=false "${{ parameters.planName }}"'
+                    backendType: "azurerm"
+                    workingDirectory: ${{ parameters.publishedArtifactsDirectory }}
+                    environmentServiceName: ${{ parameters.serviceConnection }}
