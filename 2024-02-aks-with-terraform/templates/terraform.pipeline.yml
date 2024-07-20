@@ -7,6 +7,8 @@ parameters:
     default: $(build.artifactstagingdirectory)
   - name: publishedArtifactsDirectory
     default: $(Pipeline.Workspace)/terraform
+  - name: terraformExtraCommandOptions
+    default: ""
   - name: planName
     default: tfplan
   - name: serviceConnection
@@ -42,7 +44,7 @@ stages:
               command: "plan"
               backendType: "azurerm"
               workingDirectory: ${{ parameters.terraformDir }}
-              commandOptions: "-input=false -out=${{ parameters.planName }}"
+              commandOptions: "-input=false -out=${{ parameters.planName }} ${{ parameters.terraformExtraCommandOptions }}"
               environmentServiceName: ${{ parameters.serviceConnection }}
               publishPlanResults: "Terraform plan"
 
@@ -87,7 +89,7 @@ stages:
                   displayName: terraform apply
                   inputs:
                     command: "apply"
-                    commandOptions: '-input=false "${{ parameters.planName }}"'
+                    commandOptions: '-input=false "${{ parameters.planName }}" ${{ parameters.terraformExtraCommandOptions }}'
                     backendType: "azurerm"
                     workingDirectory: ${{ parameters.publishedArtifactsDirectory }}
                     environmentServiceName: ${{ parameters.serviceConnection }}

@@ -6,9 +6,13 @@ trigger:
     include:
       - 2024-02-aks-with-terraform/02-utils
 
+variables:
+  - group: 2024-02-aks-with-terraform
+
 extends:
   template: ../templates/terraform.pipeline.yml
   parameters:
     serviceConnection: AzureSubscription
     buildAgent: ubuntu-latest
     terraformDir: $(System.DefaultWorkingDirectory)/2024-02-aks-with-terraform/02-utils
+    terraformExtraCommandOptions: " -var='key_vault_certificate_officer_id=$(key_vault_certificate_officer_id)' -var='vm_password=$(vm_password)'"
