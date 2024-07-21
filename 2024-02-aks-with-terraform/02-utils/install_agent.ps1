@@ -21,10 +21,9 @@ $tag = ($wr | ConvertFrom-Json)[0].tag_name
 $tag = $tag.Substring(1)
 
 Write-Host "$tag is the latest version"
-$url = "https://vstsagentpackage.azureedge.net/agent/$tag/vsts-agent-win-x64-$tag.zip"
 
-Invoke-WebRequest $url -Out agent.zip -UseBasicParsing
+Invoke-WebRequest "https://vstsagentpackage.azureedge.net/agent/$tag/vsts-agent-win-x64-$tag.zip" -Out agent.zip -UseBasicParsing
 Expand-Archive -Path agent.zip -DestinationPath $PWD
-.\config.cmd --unattended --url $URL --auth pat --token $PAT --pool $POOL --agent $AGENT --acceptTeeEula --runAsService
+.\config.cmd --unattended --replace --url $URL --auth pat --token $PAT --pool $POOL --agent $AGENT --acceptTeeEula --runAsService
 
 exit 0
