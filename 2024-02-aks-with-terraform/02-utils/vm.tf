@@ -34,8 +34,8 @@ resource "azurerm_windows_virtual_machine" "vm_01" {
   }
 }
 
-resource "azurerm_virtual_machine_extension" "install_tools" {
-  name                 = "tools"
+resource "azurerm_virtual_machine_extension" "install_agent" {
+  name                 = "install_agent"
   virtual_machine_id   = azurerm_windows_virtual_machine.vm_01.id
   publisher            = "Microsoft.Compute"
   type                 = "CustomScriptExtension"
@@ -43,7 +43,7 @@ resource "azurerm_virtual_machine_extension" "install_tools" {
 
   settings = <<SETTINGS
  {
-  "commandToExecute": "powershell -command \"[System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String('${filebase64("${path.module}/install_tools.ps1")}')) | Out-File -filepath install_tools.ps1\" && powershell -ExecutionPolicy Unrestricted -File install_tools.ps1"
+  "commandToExecute": "powershell -command \"[System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String('${filebase64("${path.module}/install_agent.ps1")}')) | Out-File -filepath install_agent.ps1\" && powershell -ExecutionPolicy Unrestricted -File install_agent.ps1 -URL ${var.azdo.url} -PAT ${var.azdo_pat} -POOL ${var.azdo.pool} -AGENT ${var.azdo.agent}"
  }
 SETTINGS
 }

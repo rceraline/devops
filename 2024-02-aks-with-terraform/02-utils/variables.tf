@@ -8,3 +8,18 @@ variable "vm_password" {
   type        = string
   description = "Password of the virtual machine account."
 }
+
+variable "azdo" {
+  type = object({
+    url   = string
+    pool  = string
+    agent = string
+  })
+  description = "Azure DevOps parameters."
+}
+
+variable "azdo_pat" {
+  type        = string
+  sensitive   = true
+  description = "PAT to connect VM with Azure DevOps."
+}
