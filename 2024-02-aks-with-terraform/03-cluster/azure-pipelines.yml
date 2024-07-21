@@ -6,9 +6,13 @@ trigger:
     include:
       - 2024-02-aks-with-terraform/03-cluster
 
+variables:
+  - group: 2024-02-aks-with-terraform
+
 extends:
   template: ../templates/terraform.pipeline.yml
   parameters:
     serviceConnection: AzureSubscription
     pool: windows-private
     terraformDir: $(System.DefaultWorkingDirectory)/2024-02-aks-with-terraform/03-cluster
+    terraformExtraCommandOptions: " -var=cluster_admin_ids=$(cluster_admin_ids) -var=grafana_admin_id=$(grafana_admin_id)"
