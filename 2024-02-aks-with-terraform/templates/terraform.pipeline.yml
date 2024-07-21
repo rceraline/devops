@@ -22,6 +22,11 @@ stages:
     jobs:
       - job: Plan
         steps:
+          - task: TerraformInstaller@1
+            displayName: install terraform
+            inputs:
+              terraformVersion: latest
+
           - task: TerraformCLI@1
             displayName: terraform init
             inputs:
@@ -75,6 +80,11 @@ stages:
               steps:
                 - download: "current"
                   artifact: ${{ parameters.artifactName }}
+
+                - task: TerraformInstaller@1
+                  displayName: install terraform
+                  inputs:
+                    terraformVersion: latest
 
                 - task: TerraformCLI@1
                   displayName: terraform init
