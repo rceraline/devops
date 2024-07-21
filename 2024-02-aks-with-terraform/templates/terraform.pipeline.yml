@@ -12,13 +12,12 @@ parameters:
   - name: planName
     default: tfplan
   - name: serviceConnection
-  - name: buildAgent
+  - name: pool
   - name: terraformDir
 
 stages:
   - stage: Plan
-    pool:
-      vmImage: ${{ parameters.buildAgent }}
+    pool: ${{ parameters.pool }}
     jobs:
       - job: Plan
         steps:
@@ -65,8 +64,7 @@ stages:
   - stage: Deploy
     displayName: Deploy
     condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))
-    pool:
-      vmImage: ${{ parameters.buildAgent }}
+    pool: ${{ parameters.pool }}
     jobs:
       - deployment: Deploy
         environment: ${{ parameters.environment }}

@@ -10,5 +10,5 @@ extends:
   template: ../templates/terraform.pipeline.yml
   parameters:
     serviceConnection: AzureSubscription
-    buildAgent: windows-private
+    pool: windows-private
     terraformDir: $(System.DefaultWorkingDirectory)/2024-02-aks-with-terraform/03-cluster

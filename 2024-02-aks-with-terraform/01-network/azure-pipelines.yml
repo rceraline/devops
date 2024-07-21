@@ -10,5 +10,6 @@ extends:
   template: ../templates/terraform.pipeline.yml
   parameters:
     serviceConnection: AzureSubscription
-    buildAgent: ubuntu-latest
+    pool:
+      vmImage: ubuntu-latest
     terraformDir: $(System.DefaultWorkingDirectory)/2024-02-aks-with-terraform/01-network
