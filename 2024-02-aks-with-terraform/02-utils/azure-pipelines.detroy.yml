@@ -1,0 +1,13 @@
+trigger: none
+
+variables:
+  - group: 2024-02-aks-with-terraform
+
+extends:
+  template: ../templates/terraform.destroy.pipeline.yml
+  parameters:
+    serviceConnection: AzureSubscription
+    pool:
+      vmImage: ubuntu-latest
+    terraformDir: $(System.DefaultWorkingDirectory)/2024-02-aks-with-terraform/02-utils
+    terraformExtraCommandOptions: ' -var="key_vault_certificate_officer_id=$(key_vault_certificate_officer_id)" -var="vm_password=$(vm_password)" -var="azdo=$(azdo)" -var="azdo_pat=$(azdo_pat)"'
