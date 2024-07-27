@@ -4,7 +4,7 @@ parameters:
   - name: target
     default: $(build.artifactstagingdirectory)
   - name: publishedArtifactsDirectory
-    default: "$(Pipeline.Workspace)/$(artifactName)"
+    default: $(Pipeline.Workspace)/terraform
   - name: planName
     default: tfplan
   - name: serviceConnection
