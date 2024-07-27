@@ -9,6 +9,7 @@ parameters:
     default: tfplan
   - name: serviceConnection
   - name: pool
+    type: object
   - name: terraformDir
 
 stages:
