@@ -53,9 +53,9 @@ stages:
                 **/*.tf
                 **/*.tfvars
                 **/*tfplan*
-              TargetFolder: ${{ parametes.target }}
+              TargetFolder: ${{ parameters.target }}
 
-          - publish: ${{ parametes.target }}
+          - publish: ${{ parameters.target }}
             artifact: ${{ parameters.artifactName }}
 
   - stage: Destroy
