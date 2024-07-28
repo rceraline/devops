@@ -5,6 +5,8 @@ parameters:
     default: $(build.artifactstagingdirectory)
   - name: publishedArtifactsDirectory
     default: $(Pipeline.Workspace)/terraform
+  - name: terraformExtraCommandOptions
+    default: ""
   - name: planName
     default: tfplan
   - name: serviceConnection
@@ -45,7 +47,7 @@ stages:
               command: "plan"
               backendType: "azurerm"
               workingDirectory: ${{ parameters.terraformDir }}
-              commandOptions: "-destroy -input=false -out=${{ parameters.planName }}"
+              commandOptions: "-destroy -input=false -out=${{ parameters.planName }} ${{ parameters.terraformExtraCommandOptions }}"
               environmentServiceName: ${{ parameters.serviceConnection }}
               publishPlanResults: "Terraform plan"
 
