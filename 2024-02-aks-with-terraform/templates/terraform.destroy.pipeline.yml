@@ -57,6 +57,7 @@ stages:
                 .terraform.lock.hcl
                 **/*.tf
                 **/*.tfvars
+                **/*.ps1
                 **/*tfplan*
               TargetFolder: ${{ parameters.target }}
 
