@@ -80,6 +80,13 @@ resource "azurerm_role_assignment" "cluster_admin" {
   principal_id         = data.azurerm_client_config.current.object_id
 }
 
+### CSI Driver identity
+resource "azurerm_user_assigned_identity" "workload_identity" {
+  location            = azurerm_resource_group.rg.location
+  name                = "id-csi-driver-workloadidentity-01"
+  resource_group_name = azurerm_resource_group.rg.name
+}
+
 ### AKS
 resource "azurerm_kubernetes_cluster" "aks" {
   name                   = "aks-csi-driver-01"
@@ -129,13 +136,6 @@ resource "azurerm_kubernetes_cluster" "aks" {
     azurerm_role_assignment.controlplane_identity_contributor,
     azurerm_role_assignment.controlplane_resourcegroup_contributor
   ]
-}
-
-### CSI Driver identity
-resource "azurerm_user_assigned_identity" "workload_identity" {
-  location            = azurerm_resource_group.rg.location
-  name                = "id-csi-driver-workloadidentity-01"
-  resource_group_name = azurerm_resource_group.rg.name
 }
 
 resource "azurerm_role_assignment" "secret_user" {
