@@ -1,4 +1,3 @@
-
 resource "azurerm_federated_identity_credential" "fid" {
   name                = "fid-csi-driver-workloadidentity-01"
   resource_group_name = data.azurerm_resource_group.rg.name

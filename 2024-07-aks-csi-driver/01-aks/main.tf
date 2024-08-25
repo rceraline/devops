@@ -19,15 +19,6 @@ resource "azurerm_subnet" "aks" {
   address_prefixes     = ["10.0.0.0/24"]
 }
 
-### ACR
-resource "azurerm_container_registry" "cr" {
-  name                = "cr20240701"
-  resource_group_name = azurerm_resource_group.rg.name
-  location            = azurerm_resource_group.rg.location
-  sku                 = "Basic"
-  admin_enabled       = false
-}
-
 ### Key vault
 resource "azurerm_key_vault" "kv" {
   name                        = "kv-2024070102"
@@ -66,12 +57,6 @@ resource "azurerm_role_assignment" "controlplane_resourcegroup_contributor" {
   scope                = azurerm_resource_group.rg.id
   role_definition_name = "Contributor"
   principal_id         = azurerm_user_assigned_identity.controlplane.principal_id
-}
-
-resource "azurerm_role_assignment" "kubelet_acrpull" {
-  scope                = azurerm_container_registry.cr.id
-  role_definition_name = "AcrPull"
-  principal_id         = azurerm_user_assigned_identity.kubelet.principal_id
 }
 
 resource "azurerm_role_assignment" "cluster_admin" {
