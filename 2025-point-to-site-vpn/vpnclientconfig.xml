@@ -1,24 +1,12 @@
 <clientconfig>
     <dnssuffixes>
-        <dnssuffix>.azurecr.io</dnssuffix>
-        <dnssuffix>.azuredatabricks.net</dnssuffix>
-        <dnssuffix>.azurestaticapps.net</dnssuffix>
-        <dnssuffix>.1.azurestaticapps.net</dnssuffix>
-        <dnssuffix>.2.azurestaticapps.net</dnssuffix>
-        <dnssuffix>.azurewebsites.net</dnssuffix>
-        <dnssuffix>.scm.azurewebsites.net</dnssuffix>
         <dnssuffix>.blob.core.windows.net</dnssuffix>
-        <dnssuffix>.database.windows.net</dnssuffix>
-        <dnssuffix>.datafactory.azure.net</dnssuffix>
-        <dnssuffix>.dfs.core.windows.net</dnssuffix>
-        <dnssuffix>.file.core.windows.net</dnssuffix>
-        <dnssuffix>.postgres.database.azure.com</dnssuffix>
-        <dnssuffix>.vault.azure.net</dnssuffix>
-        <dnssuffix>.vaultcore.azure.net</dnssuffix>
-        <dnssuffix>.wvd.microsoft.com</dnssuffix>
-        <dnssuffix>.azurecontainerapps.io</dnssuffix>
     </dnssuffixes>
     <dnsservers>
-        <dnsserver>10.0.3.4</dnsserver>
+        <DnsServerEntry>
+            <dnsserver>10.0.3.4</dnsserver>
+        </DnsServerEntry>
     </dnsservers>
+    <excluderoutes i:nil="true" />
+    <includeroutes i:nil="true" />
 </clientconfig>

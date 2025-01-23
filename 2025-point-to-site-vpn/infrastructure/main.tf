@@ -4,8 +4,8 @@ resource "azurerm_resource_group" "vpn" {
 }
 
 ## VNET & Subnets
-resource "azurerm_virtual_network" "hub" {
-  name                = "vnet-hub-01"
+resource "azurerm_virtual_network" "vpn" {
+  name                = "vnet-vpn-01"
   location            = azurerm_resource_group.vpn.location
   resource_group_name = azurerm_resource_group.vpn.name
   address_space       = ["10.0.0.0/16"]
@@ -14,21 +14,21 @@ resource "azurerm_virtual_network" "hub" {
 resource "azurerm_subnet" "gateway" {
   name                 = "GatewaySubnet"
   resource_group_name  = azurerm_resource_group.vpn.name
-  virtual_network_name = azurerm_virtual_network.hub.name
+  virtual_network_name = azurerm_virtual_network.vpn.name
   address_prefixes     = ["10.0.1.0/24"]
 }
 
 resource "azurerm_subnet" "vpn_01" {
   name                 = "sub-vpn-01"
   resource_group_name  = azurerm_resource_group.vpn.name
-  virtual_network_name = azurerm_virtual_network.hub.name
+  virtual_network_name = azurerm_virtual_network.vpn.name
   address_prefixes     = ["10.0.2.0/24"]
 }
 
 resource "azurerm_subnet" "inbound_dns" {
   name                 = "sub-inbounddns"
   resource_group_name  = azurerm_resource_group.vpn.name
-  virtual_network_name = azurerm_virtual_network.hub.name
+  virtual_network_name = azurerm_virtual_network.vpn.name
   address_prefixes     = ["10.0.3.0/24"]
 
   delegation {
@@ -96,7 +96,6 @@ EOF
   }
 }
 
-
 ## Storage Account
 resource "azurerm_storage_account" "vpn" {
   name                          = "stvpn20250120"
@@ -136,7 +135,7 @@ resource "azurerm_private_dns_zone_virtual_network_link" "hub" {
   name                  = "link-hub"
   resource_group_name   = azurerm_resource_group.vpn.name
   private_dns_zone_name = azurerm_private_dns_zone.blob.name
-  virtual_network_id    = azurerm_virtual_network.hub.id
+  virtual_network_id    = azurerm_virtual_network.vpn.id
 }
 
 ##Dns Private Resolver
@@ -144,7 +143,7 @@ resource "azurerm_private_dns_resolver" "vpn" {
   name                = "dnspr-vpn-01"
   resource_group_name = azurerm_resource_group.vpn.name
   location            = azurerm_resource_group.vpn.location
-  virtual_network_id  = azurerm_virtual_network.hub.id
+  virtual_network_id  = azurerm_virtual_network.vpn.id
 }
 
 resource "azurerm_private_dns_resolver_inbound_endpoint" "inbound" {
@@ -153,7 +152,6 @@ resource "azurerm_private_dns_resolver_inbound_endpoint" "inbound" {
   location                = azurerm_private_dns_resolver.vpn.location
 
   ip_configurations {
-    private_ip_allocation_method = "Dynamic"
-    subnet_id                    = azurerm_subnet.inbound_dns.id
+    subnet_id = azurerm_subnet.inbound_dns.id
   }
 }
