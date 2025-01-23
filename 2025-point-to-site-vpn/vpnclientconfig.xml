@@ -3,9 +3,7 @@
         <dnssuffix>.blob.core.windows.net</dnssuffix>
     </dnssuffixes>
     <dnsservers>
-        <DnsServerEntry>
-            <dnsserver>10.0.3.4</dnsserver>
-        </DnsServerEntry>
+        <dnsserver>10.0.3.4</dnsserver>
     </dnsservers>
     <excluderoutes i:nil="true" />
     <includeroutes i:nil="true" />
