@@ -1,0 +1,10 @@
+{
+  "version": 2,
+  "dgSpecHash": "GZRw9y5GJLRXAuCkiWF7qZAi4wefzf+ubws48OIK1+zmyPJKP1m1DCO2+cT8bRD8sVwztOMjKH3Wo3YxYu31aA==",
+  "success": true,
+  "projectFilePath": "C:\\git\\github\\devops-private\\2024-08-aks-flux\\application\\app-01\\app-01\\app-01.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\rcera\\.nuget\\packages\\microsoft.visualstudio.azure.containers.tools.targets\\1.19.5\\microsoft.visualstudio.azure.containers.tools.targets.1.19.5.nupkg.sha512"
+  ],
+  "logs": []
+}
