@@ -78,6 +78,12 @@ resource "azurerm_role_assignment" "secret_user" {
   principal_id         = azurerm_user_assigned_identity.workload_identity.principal_id
 }
 
+resource "azurerm_role_assignment" "current_user_secret_officer" {
+  scope                = azurerm_key_vault.kv.id
+  role_definition_name = "Key Vault Secrets Officer"
+  principal_id         = data.azurerm_client_config.current.object_id
+}
+
 ### AKS
 resource "azurerm_kubernetes_cluster" "aks" {
   name                   = "aks-csi-driver-01"
@@ -114,7 +120,6 @@ resource "azurerm_kubernetes_cluster" "aks" {
   }
 
   azure_active_directory_role_based_access_control {
-    managed                = true
     admin_group_object_ids = var.cluster_admin_ids
     azure_rbac_enabled     = true
   }
