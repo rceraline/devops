@@ -4,6 +4,13 @@ variable "hub_vnet" {
     address_space = set(string)
     subnets = map(object({
       address_prefixes = set(string)
+      delegation = optional(object({
+        name = string
+        service_delegation = object({
+          actions = set(string)
+          name    = string
+        })
+      }))
     }))
   })
   description = "Hub virtual network information."

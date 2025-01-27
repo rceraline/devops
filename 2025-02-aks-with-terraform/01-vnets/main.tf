@@ -15,6 +15,18 @@ resource "azurerm_virtual_network" "hub_01" {
     content {
       name             = subnet.key
       address_prefixes = subnet.value.address_prefixes
+
+      dynamic "delegation" {
+        for_each = subnet.value.delegation == null ? [] : [subnet.value.delegation]
+
+        content {
+          name = delegation.value.name
+          service_delegation {
+            actions = delegation.value.service_delegation.actions
+            name    = delegation.value.service_delegation.name
+          }
+        }
+      }
     }
   }
 }
