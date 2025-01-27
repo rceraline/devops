@@ -1,0 +1,13 @@
+<clientconfig>
+    <dnssuffixes>
+        <dnssuffix>.azurecr.io</dnssuffix>
+        <dnssuffix>.blob.core.windows.net</dnssuffix>
+        <dnssuffix>.canadacentral.azmk8s.io</dnssuffix>
+        <dnssuffix>.vaultcore.azure.net</dnssuffix>
+    </dnssuffixes>
+    <dnsservers>
+        <dnsserver>10.0.3.4</dnsserver>
+    </dnsservers>
+    <excluderoutes i:nil="true" />
+    <includeroutes i:nil="true" />
+</clientconfig>
