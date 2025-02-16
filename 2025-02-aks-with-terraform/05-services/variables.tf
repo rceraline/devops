@@ -18,5 +18,10 @@ variable "key_vault_name" {
 
 variable "container_registry_name" {
   type        = string
-  description = "Namme of the container registry."
+  description = "Name of the container registry."
+}
+
+variable "storage_account_name" {
+  type        = string
+  description = "Name of the storage account."
 }

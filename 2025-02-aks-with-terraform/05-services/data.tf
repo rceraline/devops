@@ -19,3 +19,8 @@ data "azurerm_private_dns_zone" "cr" {
   name                = "privatelink.azurecr.io"
   resource_group_name = var.resource_group_name
 }
+
+data "azurerm_private_dns_zone" "st" {
+  name                = "privatelink.blob.core.windows.net"
+  resource_group_name = var.resource_group_name
+}

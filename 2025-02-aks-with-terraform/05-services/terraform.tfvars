@@ -7,3 +7,5 @@ pe_subnet = {
 
 key_vault_name          = "kv-20250201"
 container_registry_name = "cr20250201"
+
+storage_account_name = "st20250201"
