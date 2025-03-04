@@ -4,3 +4,8 @@ pe_subnet = {
 }
 
 resource_group_name = "rg-aks-with-terraform-01"
+
+log_analytics_workspace_name             = "log-01"
+monitor_private_link_scope_name          = "ampls-01"
+monitor_private_link_scoped_service_name = "amplss-log-01"
+monitor_workspace_name                   = "amw-01"
