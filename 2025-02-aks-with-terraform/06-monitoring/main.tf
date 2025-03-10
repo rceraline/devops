@@ -67,3 +67,18 @@ resource "azurerm_private_endpoint" "amw" {
     private_dns_zone_ids = [data.azurerm_private_dns_zone.prometheus.id]
   }
 }
+
+resource "azurerm_dashboard_grafana" "grafana" {
+  name                  = var.grafana_dashboard_name
+  resource_group_name   = data.azurerm_resource_group.rg.name
+  location              = data.azurerm_resource_group.rg.location
+  grafana_major_version = 10
+
+  identity {
+    type = "SystemAssigned"
+  }
+
+  azure_monitor_workspace_integrations {
+    resource_id = azurerm_monitor_workspace.amw.id
+  }
+}

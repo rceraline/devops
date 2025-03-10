@@ -68,15 +68,18 @@ resource "azurerm_kubernetes_cluster" "aks" {
   local_account_disabled     = true
   sku_tier                   = "Standard"
 
-  api_server_access_profile {
-  }
-
   default_node_pool {
     name                         = "system"
     node_count                   = 3
     only_critical_addons_enabled = true
     vm_size                      = "Standard_D2s_v3"
     vnet_subnet_id               = data.azurerm_subnet.nodes.id
+
+    upgrade_settings {
+      drain_timeout_in_minutes      = 0
+      max_surge                     = "10%"
+      node_soak_duration_in_minutes = 0
+    }
   }
 
   identity {
@@ -96,10 +99,11 @@ resource "azurerm_kubernetes_cluster" "aks" {
     service_cidr   = "10.1.3.0/24"
   }
 
-  key_management_service {
-    key_vault_key_id         = azurerm_key_vault_key.kms.id
-    key_vault_network_access = "Private"
-  }
+  # KMS cannot be enabled with Terraform until VNET integration is GA.
+  # key_management_service {
+  #   key_vault_key_id         = azurerm_key_vault_key.kms.id
+  #   key_vault_network_access = "Private"
+  # }
 
   azure_active_directory_role_based_access_control {
     admin_group_object_ids = var.cluster_admin_ids
@@ -123,6 +127,8 @@ resource "azurerm_kubernetes_cluster_node_pool" "user" {
   name                  = "user"
   kubernetes_cluster_id = azurerm_kubernetes_cluster.aks.id
   vm_size               = "Standard_D2s_v3"
-  node_count            = 3
+  auto_scaling_enabled  = true
+  max_count             = 10
+  min_count             = 2
   vnet_subnet_id        = data.azurerm_subnet.nodes.id
 }

@@ -29,3 +29,13 @@ data "azurerm_private_dns_zone" "aks" {
   name                = "privatelink.canadacentral.azmk8s.io"
   resource_group_name = var.resource_group_name
 }
+
+data "azurerm_dashboard_grafana" "grafana" {
+  resource_group_name = var.resource_group_name
+  name                = var.grafana_dashboard_name
+}
+
+data "azurerm_monitor_workspace" "amw" {
+  resource_group_name = var.resource_group_name
+  name                = var.monitor_workspace_name
+}

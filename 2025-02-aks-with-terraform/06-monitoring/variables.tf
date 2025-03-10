@@ -3,6 +3,11 @@ variable "resource_group_name" {
   description = "Name of the resource group."
 }
 
+variable "grafana_dashboard_name" {
+  type        = string
+  description = "Name of the grafana dashboard."
+}
+
 variable "pe_subnet" {
   type = object({
     name      = string
