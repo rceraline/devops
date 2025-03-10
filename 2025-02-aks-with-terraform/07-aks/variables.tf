@@ -33,11 +33,6 @@ variable "cluster_admin_ids" {
   description = "List of user or group IDs that will be admin of the cluster."
 }
 
-variable "grafana_admin_id" {
-  type        = string
-  description = "ID of the grafana administrator."
-}
-
 variable "grafana_dashboard_name" {
   type        = string
   description = "Name of the Grafana dashboard."

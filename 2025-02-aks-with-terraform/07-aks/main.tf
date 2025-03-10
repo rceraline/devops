@@ -110,6 +110,11 @@ resource "azurerm_kubernetes_cluster" "aks" {
     azure_rbac_enabled     = true
   }
 
+  monitor_metrics {
+    annotations_allowed = null
+    labels_allowed      = null
+  }
+
   oms_agent {
     log_analytics_workspace_id      = data.azurerm_log_analytics_workspace.log.id
     msi_auth_for_monitoring_enabled = true

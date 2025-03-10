@@ -48,18 +48,6 @@ resource "azurerm_monitor_data_collection_rule_association" "dcra_prometheus" {
   ]
 }
 
-resource "azurerm_role_assignment" "datareaderrole" {
-  scope                = data.azurerm_monitor_workspace.amw.id
-  role_definition_name = "Monitoring Reader"
-  principal_id         = data.azurerm_dashboard_grafana.grafana.identity.0.principal_id
-}
-
-resource "azurerm_role_assignment" "grafana_admin" {
-  scope                = data.azurerm_dashboard_grafana.grafana.id
-  role_definition_name = "Grafana Admin"
-  principal_id         = var.grafana_admin_id
-}
-
 resource "azurerm_monitor_alert_prometheus_rule_group" "node_recording_rules_rule_group" {
   name                = "NodeRecordingRulesRuleGroup-${azurerm_kubernetes_cluster.aks.name}"
   location            = data.azurerm_resource_group.rg.location

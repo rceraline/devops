@@ -82,3 +82,15 @@ resource "azurerm_dashboard_grafana" "grafana" {
     resource_id = azurerm_monitor_workspace.amw.id
   }
 }
+
+resource "azurerm_role_assignment" "datareaderrole" {
+  scope                = azurerm_monitor_workspace.amw.id
+  role_definition_name = "Monitoring Reader"
+  principal_id         = azurerm_dashboard_grafana.grafana.identity.0.principal_id
+}
+
+resource "azurerm_role_assignment" "grafana_admin" {
+  scope                = azurerm_dashboard_grafana.grafana.id
+  role_definition_name = "Grafana Admin"
+  principal_id         = var.grafana_admin_id
+}

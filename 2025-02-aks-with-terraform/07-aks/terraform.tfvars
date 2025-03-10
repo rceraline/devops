@@ -7,6 +7,5 @@ aks_vnet_name                = "vnet-aks-01"
 cluster_admin_ids            = ["b230bb12-c226-4606-a8ac-9ca05f2fbf66"]
 key_vault_name               = "kv-20250201"
 log_analytics_workspace_name = "log-01"
-grafana_admin_id             = "b230bb12-c226-4606-a8ac-9ca05f2fbf66"
 grafana_dashboard_name       = "amg-01"
 monitor_workspace_name       = "amw-01"

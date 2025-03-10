@@ -3,6 +3,11 @@ variable "resource_group_name" {
   description = "Name of the resource group."
 }
 
+variable "grafana_admin_id" {
+  type        = string
+  description = "ID of the grafana administrator."
+}
+
 variable "grafana_dashboard_name" {
   type        = string
   description = "Name of the grafana dashboard."
