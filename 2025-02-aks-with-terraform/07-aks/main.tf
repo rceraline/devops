@@ -35,6 +35,14 @@ resource "azurerm_role_assignment" "kubelet_acrpull" {
   principal_id         = azurerm_user_assigned_identity.kubelet.principal_id
 }
 
+resource "azurerm_role_assignment" "cluster_admins" {
+  for_each = toset(var.cluster_admin_ids)
+
+  scope                = azurerm_kubernetes_cluster.aks.id
+  role_definition_name = "Azure Kubernetes Service RBAC Cluster Admin"
+  principal_id         = each.key
+}
+
 ## KMS key
 resource "azurerm_role_assignment" "crypto_officer" {
   scope                = data.azurerm_key_vault.kv.id
@@ -58,15 +66,16 @@ resource "azurerm_key_vault_key" "kms" {
 
 ## AKS
 resource "azurerm_kubernetes_cluster" "aks" {
-  name                       = var.aks_name
-  location                   = data.azurerm_resource_group.rg.location
-  resource_group_name        = data.azurerm_resource_group.rg.name
-  private_cluster_enabled    = true
-  dns_prefix_private_cluster = var.aks_name
-  kubernetes_version         = var.aks_version
-  private_dns_zone_id        = data.azurerm_private_dns_zone.aks.id
-  local_account_disabled     = true
-  sku_tier                   = "Standard"
+  name                             = var.aks_name
+  location                         = data.azurerm_resource_group.rg.location
+  resource_group_name              = data.azurerm_resource_group.rg.name
+  private_cluster_enabled          = true
+  dns_prefix_private_cluster       = var.aks_name
+  kubernetes_version               = var.aks_version
+  private_dns_zone_id              = data.azurerm_private_dns_zone.aks.id
+  local_account_disabled           = true
+  sku_tier                         = "Standard"
+  http_application_routing_enabled = true
 
   default_node_pool {
     name                         = "system"

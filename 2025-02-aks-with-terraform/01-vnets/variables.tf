@@ -35,3 +35,23 @@ variable "spoke_vnets" {
   }))
   description = "List of spoke virtual networks."
 }
+
+variable "vpn_pip_name" {
+  type        = string
+  description = "Name of the VPN public IP."
+}
+
+variable "vpn_gateway_name" {
+  type        = string
+  description = "Name of the VPN gateway."
+}
+
+variable "vpn_client_address_space" {
+  type        = list(string)
+  description = "List of VPN client address spaces."
+}
+
+variable "vpn_public_cert_data" {
+  type        = string
+  description = "Public root certificate in base64."
+}
