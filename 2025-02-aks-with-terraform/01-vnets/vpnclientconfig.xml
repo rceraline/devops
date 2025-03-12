@@ -4,6 +4,7 @@
         <dnssuffix>.blob.core.windows.net</dnssuffix>
         <dnssuffix>.canadacentral.azmk8s.io</dnssuffix>
         <dnssuffix>.canadacentral.prometheus.monitor.azure.com</dnssuffix>
+        <dnssuffix>.grafana.azure.com</dnssuffix>
         <dnssuffix>.monitor.azure.com</dnssuffix>
         <dnssuffix>.vault.azure.net</dnssuffix>
         <dnssuffix>.vaultcore.azure.net</dnssuffix>

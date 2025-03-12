@@ -15,6 +15,20 @@ resource "azurerm_monitor_private_link_scope" "ampls" {
   query_access_mode     = "PrivateOnly"
 }
 
+resource "azurerm_monitor_data_collection_endpoint" "dce_prometheus" {
+  name                = "MSProm-aks-01"
+  resource_group_name = data.azurerm_resource_group.rg.name
+  location            = data.azurerm_resource_group.rg.location
+  kind                = "Linux"
+}
+
+resource "azurerm_monitor_private_link_scoped_service" "dce_prometheus" {
+  name                = "link-MSProm-aks-01"
+  resource_group_name = data.azurerm_resource_group.rg.name
+  scope_name          = azurerm_monitor_private_link_scope.ampls.name
+  linked_resource_id  = azurerm_monitor_data_collection_endpoint.dce_prometheus.id
+}
+
 resource "azurerm_monitor_private_link_scoped_service" "log" {
   name                = var.monitor_private_link_scoped_service_name
   resource_group_name = data.azurerm_resource_group.rg.name
@@ -44,9 +58,10 @@ resource "azurerm_private_endpoint" "log" {
 
 ## Azure Monitor Workspace
 resource "azurerm_monitor_workspace" "amw" {
-  name                = var.monitor_workspace_name
-  resource_group_name = data.azurerm_resource_group.rg.name
-  location            = data.azurerm_resource_group.rg.location
+  name                          = var.monitor_workspace_name
+  resource_group_name           = data.azurerm_resource_group.rg.name
+  location                      = data.azurerm_resource_group.rg.location
+  public_network_access_enabled = false
 }
 
 resource "azurerm_private_endpoint" "amw" {
@@ -68,11 +83,13 @@ resource "azurerm_private_endpoint" "amw" {
   }
 }
 
+## grafana
 resource "azurerm_dashboard_grafana" "grafana" {
-  name                  = var.grafana_dashboard_name
-  resource_group_name   = data.azurerm_resource_group.rg.name
-  location              = data.azurerm_resource_group.rg.location
-  grafana_major_version = 10
+  name                          = var.grafana_dashboard_name
+  resource_group_name           = data.azurerm_resource_group.rg.name
+  location                      = data.azurerm_resource_group.rg.location
+  grafana_major_version         = 10
+  public_network_access_enabled = false
 
   identity {
     type = "SystemAssigned"
@@ -80,6 +97,25 @@ resource "azurerm_dashboard_grafana" "grafana" {
 
   azure_monitor_workspace_integrations {
     resource_id = azurerm_monitor_workspace.amw.id
+  }
+}
+
+resource "azurerm_private_endpoint" "grafana" {
+  name                = "pe-${var.grafana_dashboard_name}"
+  location            = data.azurerm_resource_group.rg.location
+  resource_group_name = data.azurerm_resource_group.rg.name
+  subnet_id           = data.azurerm_subnet.pe_01.id
+
+  private_service_connection {
+    name                           = "psc-${var.grafana_dashboard_name}"
+    private_connection_resource_id = azurerm_dashboard_grafana.grafana.id
+    subresource_names              = ["grafana"]
+    is_manual_connection           = false
+  }
+
+  private_dns_zone_group {
+    name                 = "pdzg-${var.grafana_dashboard_name}"
+    private_dns_zone_ids = [data.azurerm_private_dns_zone.grafana.id]
   }
 }
 

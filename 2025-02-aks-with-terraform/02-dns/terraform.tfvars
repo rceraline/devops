@@ -10,6 +10,7 @@ private_dns_zone_names = [
   "privatelink.blob.core.windows.net",
   "privatelink.canadacentral.azmk8s.io",
   "privatelink.canadacentral.prometheus.monitor.azure.com",
+  "privatelink.grafana.azure.com",
   "privatelink.monitor.azure.com",
   "privatelink.vaultcore.azure.net"
 ]

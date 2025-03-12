@@ -48,6 +48,11 @@ variable "key_vault_name" {
   description = "Name of the key vault."
 }
 
+variable "monitor_private_link_scope_name" {
+  type        = string
+  description = "Name of the monitor private link scope."
+}
+
 variable "monitor_workspace_name" {
   type        = string
   description = "Name of the Azure Monitor Workspace."

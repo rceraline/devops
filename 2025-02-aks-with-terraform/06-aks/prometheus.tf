@@ -1,15 +1,10 @@
-resource "azurerm_monitor_data_collection_endpoint" "dce_prometheus" {
-  name                = "MSProm-${azurerm_kubernetes_cluster.aks.name}"
-  resource_group_name = data.azurerm_resource_group.rg.name
-  location            = data.azurerm_resource_group.rg.location
-  kind                = "Linux"
-}
+
 
 resource "azurerm_monitor_data_collection_rule" "dcr_prometheus" {
   name                        = "MSProm-${azurerm_kubernetes_cluster.aks.name}"
   resource_group_name         = data.azurerm_resource_group.rg.name
   location                    = data.azurerm_resource_group.rg.location
-  data_collection_endpoint_id = azurerm_monitor_data_collection_endpoint.dce_prometheus.id
+  data_collection_endpoint_id = data.azurerm_monitor_data_collection_endpoint.dce_prometheus.id
   kind                        = "Linux"
 
   destinations {
@@ -33,9 +28,6 @@ resource "azurerm_monitor_data_collection_rule" "dcr_prometheus" {
   }
 
   description = "DCR for Azure Monitor Metrics Profile (Managed Prometheus)"
-  depends_on = [
-    azurerm_monitor_data_collection_endpoint.dce_prometheus
-  ]
 }
 
 resource "azurerm_monitor_data_collection_rule_association" "dcra_prometheus" {
