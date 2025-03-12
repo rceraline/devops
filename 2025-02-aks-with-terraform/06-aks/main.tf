@@ -44,25 +44,25 @@ resource "azurerm_role_assignment" "cluster_admins" {
 }
 
 ## KMS key
-resource "azurerm_role_assignment" "crypto_officer" {
-  scope                = data.azurerm_key_vault.kv.id
-  role_definition_name = "Key Vault Crypto Officer"
-  principal_id         = data.azurerm_client_config.current.object_id
-}
+# resource "azurerm_role_assignment" "crypto_officer" {
+#   scope                = data.azurerm_key_vault.kv.id
+#   role_definition_name = "Key Vault Crypto Officer"
+#   principal_id         = data.azurerm_client_config.current.object_id
+# }
 
-resource "azurerm_key_vault_key" "kms" {
-  name         = "generated-kms"
-  key_vault_id = data.azurerm_key_vault.kv.id
-  key_type     = "RSA"
-  key_size     = 2048
+# resource "azurerm_key_vault_key" "kms" {
+#   name         = "generated-kms"
+#   key_vault_id = data.azurerm_key_vault.kv.id
+#   key_type     = "RSA"
+#   key_size     = 2048
 
-  key_opts = [
-    "decrypt",
-    "encrypt"
-  ]
+#   key_opts = [
+#     "decrypt",
+#     "encrypt"
+#   ]
 
-  depends_on = [azurerm_role_assignment.crypto_officer]
-}
+#   depends_on = [azurerm_role_assignment.crypto_officer]
+# }
 
 ## AKS
 resource "azurerm_kubernetes_cluster" "aks" {
@@ -132,7 +132,7 @@ resource "azurerm_kubernetes_cluster" "aks" {
   depends_on = [
     azurerm_role_assignment.controlplane_identity_contributor,
     azurerm_role_assignment.controlplane_keyvault_crypto_user,
-    azurerm_role_assignment.controlplane_resourcegroup_contributor
+    azurerm_role_assignment.controlplane_resourcegroup_contributor,
   ]
 }
 
