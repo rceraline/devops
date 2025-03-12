@@ -30,6 +30,11 @@ data "azurerm_private_dns_zone" "aks" {
   resource_group_name = var.resource_group_name
 }
 
+data "azurerm_private_dns_zone" "mydomain" {
+  name                = "mydomain.com"
+  resource_group_name = var.resource_group_name
+}
+
 data "azurerm_dashboard_grafana" "grafana" {
   resource_group_name = var.resource_group_name
   name                = var.grafana_dashboard_name

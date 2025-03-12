@@ -6,6 +6,7 @@ dns_resolver_name        = "dnspr-01"
 
 hub_vnet_name = "vnet-hub-01"
 private_dns_zone_names = [
+  "mydomain.com",
   "privatelink.azurecr.io",
   "privatelink.blob.core.windows.net",
   "privatelink.canadacentral.azmk8s.io",

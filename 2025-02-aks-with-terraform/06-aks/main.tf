@@ -66,16 +66,15 @@ resource "azurerm_role_assignment" "cluster_admins" {
 
 ## AKS
 resource "azurerm_kubernetes_cluster" "aks" {
-  name                             = var.aks_name
-  location                         = data.azurerm_resource_group.rg.location
-  resource_group_name              = data.azurerm_resource_group.rg.name
-  private_cluster_enabled          = true
-  dns_prefix_private_cluster       = var.aks_name
-  kubernetes_version               = var.aks_version
-  private_dns_zone_id              = data.azurerm_private_dns_zone.aks.id
-  local_account_disabled           = true
-  sku_tier                         = "Standard"
-  http_application_routing_enabled = true
+  name                       = var.aks_name
+  location                   = data.azurerm_resource_group.rg.location
+  resource_group_name        = data.azurerm_resource_group.rg.name
+  private_cluster_enabled    = true
+  dns_prefix_private_cluster = var.aks_name
+  kubernetes_version         = var.aks_version
+  private_dns_zone_id        = data.azurerm_private_dns_zone.aks.id
+  local_account_disabled     = true
+  sku_tier                   = "Standard"
 
   default_node_pool {
     name                         = "system"
@@ -83,6 +82,7 @@ resource "azurerm_kubernetes_cluster" "aks" {
     only_critical_addons_enabled = true
     vm_size                      = "Standard_D2s_v3"
     vnet_subnet_id               = data.azurerm_subnet.nodes.id
+    zones                        = ["1", "2", "3"]
 
     upgrade_settings {
       drain_timeout_in_minutes      = 0
@@ -129,6 +129,10 @@ resource "azurerm_kubernetes_cluster" "aks" {
     msi_auth_for_monitoring_enabled = true
   }
 
+  web_app_routing {
+    dns_zone_ids = [data.azurerm_private_dns_zone.mydomain.id]
+  }
+
   depends_on = [
     azurerm_role_assignment.controlplane_identity_contributor,
     azurerm_role_assignment.controlplane_keyvault_crypto_user,
@@ -145,4 +149,5 @@ resource "azurerm_kubernetes_cluster_node_pool" "user" {
   max_count             = 10
   min_count             = 2
   vnet_subnet_id        = data.azurerm_subnet.nodes.id
+  zones                 = ["1", "2", "3"]
 }
