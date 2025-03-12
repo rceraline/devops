@@ -20,6 +20,34 @@ resource "azurerm_firewall" "afw" {
   }
 }
 
+resource "azurerm_firewall_network_rule_collection" "allow_all" {
+  name                = "allow-all-nr"
+  azure_firewall_name = azurerm_firewall.afw.name
+  resource_group_name = data.azurerm_resource_group.rg.name
+  priority            = 100
+  action              = "Allow"
+
+  rule {
+    name = "All"
+
+    source_addresses = [
+      "*",
+    ]
+
+    destination_ports = [
+      "*",
+    ]
+
+    destination_addresses = [
+      "*",
+    ]
+
+    protocols = [
+      "Any",
+    ]
+  }
+}
+
 ## Route Tables
 resource "azurerm_route_table" "rts" {
   for_each = var.to_firewall_route_tables
