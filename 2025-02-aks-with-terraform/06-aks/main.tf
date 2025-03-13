@@ -43,6 +43,12 @@ resource "azurerm_role_assignment" "cluster_admins" {
   principal_id         = each.key
 }
 
+resource "azurerm_role_assignment" "web_app_routing_private_dns_zone" {
+  scope                = data.azurerm_private_dns_zone.mydomain.id
+  role_definition_name = "Private DNS Zone Contributor"
+  principal_id         = azurerm_kubernetes_cluster.aks.web_app_routing[0].web_app_routing_identity[0].object_id
+}
+
 ## KMS key
 # resource "azurerm_role_assignment" "crypto_officer" {
 #   scope                = data.azurerm_key_vault.kv.id
