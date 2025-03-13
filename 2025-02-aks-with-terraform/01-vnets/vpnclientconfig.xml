@@ -8,6 +8,7 @@
         <dnssuffix>.monitor.azure.com</dnssuffix>
         <dnssuffix>.vault.azure.net</dnssuffix>
         <dnssuffix>.vaultcore.azure.net</dnssuffix>
+        <dnssuffix>.mydomain.com</dnssuffix>
     </dnssuffixes>
     <dnsservers>
         <dnsserver>10.0.2.4</dnsserver>
