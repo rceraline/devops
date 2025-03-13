@@ -23,4 +23,16 @@ data "azurerm_private_dns_zone" "prometheus" {
   resource_group_name = var.resource_group_name
 }
 
+## AMPLS zones
+data "azurerm_private_dns_zone" "ampls" {
+  for_each = toset([
+    "privatelink.blob.core.windows.net",
+    "privatelink.monitor.azure.com",
+    "privatelink.oms.opinsights.azure.com",
+    "privatelink.ods.opinsights.azure.com",
+    "privatelink.agentsvc.azure-automation.net"
+  ])
 
+  name                = each.key
+  resource_group_name = var.resource_group_name
+}
