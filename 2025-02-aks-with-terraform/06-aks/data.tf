@@ -15,9 +15,10 @@ data "azurerm_subnet" "nodes" {
   virtual_network_name = var.aks_vnet_name
 }
 
-data "azurerm_log_analytics_workspace" "log" {
-  resource_group_name = var.resource_group_name
-  name                = var.log_analytics_workspace_name
+data "azurerm_subnet" "pe_01" {
+  name                 = var.pe_subnet.name
+  resource_group_name  = var.resource_group_name
+  virtual_network_name = var.pe_subnet.vnet_name
 }
 
 data "azurerm_key_vault" "kv" {
@@ -30,22 +31,31 @@ data "azurerm_private_dns_zone" "aks" {
   resource_group_name = var.resource_group_name
 }
 
+data "azurerm_private_dns_zone" "grafana" {
+  name                = "privatelink.grafana.azure.com"
+  resource_group_name = var.resource_group_name
+}
+
+# data "azurerm_private_dns_zone" "prometheus" {
+#   name                = "privatelink.canadacentral.prometheus.monitor.azure.com"
+#   resource_group_name = var.resource_group_name
+# }
+
 data "azurerm_private_dns_zone" "mydomain" {
   name                = "mydomain.com"
   resource_group_name = var.resource_group_name
 }
 
-data "azurerm_dashboard_grafana" "grafana" {
-  resource_group_name = var.resource_group_name
-  name                = var.grafana_dashboard_name
-}
+## AMPLS zones
+data "azurerm_private_dns_zone" "ampls" {
+  for_each = toset([
+    "privatelink.blob.core.windows.net",
+    "privatelink.monitor.azure.com",
+    "privatelink.oms.opinsights.azure.com",
+    "privatelink.ods.opinsights.azure.com",
+    "privatelink.agentsvc.azure-automation.net"
+  ])
 
-data "azurerm_monitor_workspace" "amw" {
+  name                = each.key
   resource_group_name = var.resource_group_name
-  name                = var.monitor_workspace_name
-}
-
-data "azurerm_monitor_data_collection_endpoint" "dce_prometheus" {
-  name                = "MSProm-aks-01"
-  resource_group_name = data.azurerm_resource_group.rg.name
 }

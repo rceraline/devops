@@ -38,6 +38,11 @@ variable "grafana_dashboard_name" {
   description = "Name of the Grafana dashboard."
 }
 
+variable "grafana_version" {
+  type        = string
+  description = "Version of Grafana."
+}
+
 variable "log_analytics_workspace_name" {
   type        = string
   description = "Name of the log analytics workspace."
@@ -48,12 +53,30 @@ variable "key_vault_name" {
   description = "Name of the key vault."
 }
 
-variable "monitor_private_link_scope_name" {
-  type        = string
-  description = "Name of the monitor private link scope."
-}
-
 variable "monitor_workspace_name" {
   type        = string
   description = "Name of the Azure Monitor Workspace."
+}
+
+variable "monitor_data_collection_endpoint_name" {
+  type        = string
+  description = "Name of the Azure monitor DCE."
+}
+
+variable "monitor_data_collection_rule_name" {
+  type        = string
+  description = "Name of the Azure monitor DCR."
+}
+
+variable "monitor_private_link_scope_name" {
+  type        = string
+  description = "Name of the Azure Monitor Private Link Scope."
+}
+
+variable "pe_subnet" {
+  type = object({
+    name      = string
+    vnet_name = string
+  })
+  description = "Subnet where the private service endpoints are deployed."
 }
