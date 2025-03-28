@@ -36,10 +36,10 @@ data "azurerm_private_dns_zone" "grafana" {
   resource_group_name = var.resource_group_name
 }
 
-# data "azurerm_private_dns_zone" "prometheus" {
-#   name                = "privatelink.canadacentral.prometheus.monitor.azure.com"
-#   resource_group_name = var.resource_group_name
-# }
+data "azurerm_private_dns_zone" "prometheus" {
+  name                = "privatelink.canadacentral.prometheus.monitor.azure.com"
+  resource_group_name = var.resource_group_name
+}
 
 data "azurerm_private_dns_zone" "mydomain" {
   name                = "mydomain.com"

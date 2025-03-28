@@ -1,93 +1,3 @@
-## Identities
-resource "azurerm_user_assigned_identity" "controlplane" {
-  location            = data.azurerm_resource_group.rg.location
-  name                = "id-controlplane-01"
-  resource_group_name = data.azurerm_resource_group.rg.name
-}
-
-resource "azurerm_user_assigned_identity" "kubelet" {
-  location            = data.azurerm_resource_group.rg.location
-  name                = "id-kubelet-01"
-  resource_group_name = data.azurerm_resource_group.rg.name
-}
-
-resource "azurerm_role_assignment" "controlplane_identity_contributor" {
-  scope                = azurerm_user_assigned_identity.kubelet.id
-  role_definition_name = "Managed Identity Contributor"
-  principal_id         = azurerm_user_assigned_identity.controlplane.principal_id
-}
-
-resource "azurerm_role_assignment" "controlplane_resourcegroup_contributor" {
-  scope                = data.azurerm_resource_group.rg.id
-  role_definition_name = "Contributor"
-  principal_id         = azurerm_user_assigned_identity.controlplane.principal_id
-}
-
-# resource "azurerm_role_assignment" "controlplane_keyvault_crypto_user" {
-#   scope                = data.azurerm_key_vault.kv.id
-#   role_definition_name = "Key Vault Crypto User"
-#   principal_id         = azurerm_user_assigned_identity.controlplane.principal_id
-# }
-
-# resource "azurerm_role_assignment" "kubelet_acrpull" {
-#   scope                = data.azurerm_container_registry.cr.id
-#   role_definition_name = "AcrPull"
-#   principal_id         = azurerm_user_assigned_identity.kubelet.principal_id
-# }
-
-# resource "azurerm_role_assignment" "cluster_admins" {
-#   for_each = toset(var.cluster_admin_ids)
-
-#   scope                = azurerm_kubernetes_cluster.k8s.id
-#   role_definition_name = "Azure Kubernetes Service RBAC Cluster Admin"
-#   principal_id         = each.key
-# }
-
-# resource "azurerm_role_assignment" "web_app_routing_private_dns_zone" {
-#   scope                = data.azurerm_private_dns_zone.mydomain.id
-#   role_definition_name = "Private DNS Zone Contributor"
-#   principal_id         = azurerm_kubernetes_cluster.k8s.web_app_routing[0].web_app_routing_identity[0].object_id
-# }
-
-resource "azurerm_kubernetes_cluster" "k8s" {
-  location            = data.azurerm_resource_group.rg.location
-  name                = "aks-02"
-  resource_group_name = data.azurerm_resource_group.rg.name
-
-  # dns_prefix = "aks-02"
-
-  private_cluster_enabled    = true
-  dns_prefix_private_cluster = "aks-02"
-  private_dns_zone_id        = data.azurerm_private_dns_zone.aks.id
-
-  default_node_pool {
-    name           = "agentpool"
-    vm_size        = "Standard_D2_v2"
-    node_count     = 2
-    vnet_subnet_id = data.azurerm_subnet.nodes.id
-  }
-
-  monitor_metrics {
-    annotations_allowed = null
-    labels_allowed      = null
-  }
-
-  network_profile {
-    network_plugin    = "kubenet"
-    load_balancer_sku = "standard"
-  }
-
-  identity {
-    type         = "UserAssigned"
-    identity_ids = [azurerm_user_assigned_identity.controlplane.id]
-  }
-}
-
-
-
-
-
-
 ##### Azure Monitor Workspace #######
 
 resource "azurerm_monitor_workspace" "amw" {
@@ -96,31 +6,33 @@ resource "azurerm_monitor_workspace" "amw" {
   location            = data.azurerm_resource_group.rg.location
 }
 
-# resource "azurerm_private_endpoint" "amw" {
-#   name                = "pe-${var.monitor_workspace_name}"
-#   location            = data.azurerm_resource_group.rg.location
-#   resource_group_name = data.azurerm_resource_group.rg.name
-#   subnet_id           = data.azurerm_subnet.pe_01.id
+resource "azurerm_private_endpoint" "amw" {
+  name                = "pe-${var.monitor_workspace_name}"
+  location            = data.azurerm_resource_group.rg.location
+  resource_group_name = data.azurerm_resource_group.rg.name
+  subnet_id           = data.azurerm_subnet.pe_01.id
 
-#   private_service_connection {
-#     name                           = "psc-${var.monitor_workspace_name}"
-#     private_connection_resource_id = azurerm_monitor_workspace.amw.id
-#     subresource_names              = ["prometheusMetrics"]
-#     is_manual_connection           = false
-#   }
+  private_service_connection {
+    name                           = "psc-${var.monitor_workspace_name}"
+    private_connection_resource_id = azurerm_monitor_workspace.amw.id
+    subresource_names              = ["prometheusMetrics"]
+    is_manual_connection           = false
+  }
 
-#   private_dns_zone_group {
-#     name                 = "pdzg-${var.monitor_workspace_name}"
-#     private_dns_zone_ids = [data.azurerm_private_dns_zone.prometheus.id]
-#   }
-# }
+  private_dns_zone_group {
+    name                 = "pdzg-${var.monitor_workspace_name}"
+    private_dns_zone_ids = [data.azurerm_private_dns_zone.prometheus.id]
+  }
+}
 
-# resource "azurerm_monitor_data_collection_endpoint" "dce" {
-#   name                = var.monitor_data_collection_endpoint_name
-#   resource_group_name = data.azurerm_resource_group.rg.name
-#   location            = data.azurerm_resource_group.rg.location
-#   kind                = "Linux"
-# }
+resource "azurerm_dashboard_grafana_managed_private_endpoint" "amw" {
+  grafana_id                   = azurerm_dashboard_grafana.grafana.id
+  name                         = "mpe-${var.monitor_workspace_name}"
+  location                     = data.azurerm_resource_group.rg.location
+  private_link_resource_id     = azurerm_monitor_workspace.amw.id
+  group_ids                    = ["prometheusMetrics"]
+  private_link_resource_region = data.azurerm_resource_group.rg.location
+}
 
 ######### AMPLS ###############
 
@@ -211,7 +123,7 @@ resource "azurerm_monitor_data_collection_rule" "dcr" {
 
 resource "azurerm_monitor_data_collection_rule_association" "dcra_rule" {
   name                    = "MSProm-${data.azurerm_resource_group.rg.location}-${var.aks_name}"
-  target_resource_id      = azurerm_kubernetes_cluster.k8s.id
+  target_resource_id      = azurerm_kubernetes_cluster.aks.id
   data_collection_rule_id = azurerm_monitor_data_collection_rule.dcr.id
   description             = "Association of data collection rule. Deleting this association will break the data collection for this AKS Cluster."
   depends_on = [
@@ -221,7 +133,7 @@ resource "azurerm_monitor_data_collection_rule_association" "dcra_rule" {
 
 resource "azurerm_monitor_data_collection_rule_association" "dcra_endpoint" {
   name                        = "configurationAccessEndpoint"
-  target_resource_id          = azurerm_kubernetes_cluster.k8s.id
+  target_resource_id          = azurerm_kubernetes_cluster.aks.id
   data_collection_endpoint_id = azurerm_monitor_workspace.amw.default_data_collection_endpoint_id
   description                 = "Association of data collection endpoint. Deleting this association will break the data collection for this AKS Cluster."
 }
@@ -281,7 +193,7 @@ resource "azurerm_monitor_alert_prometheus_rule_group" "node_recording_rules_rul
   description         = "Node Recording Rules Rule Group"
   rule_group_enabled  = true
   interval            = "PT1M"
-  scopes              = [azurerm_monitor_workspace.amw.id, azurerm_kubernetes_cluster.k8s.id]
+  scopes              = [azurerm_monitor_workspace.amw.id, azurerm_kubernetes_cluster.aks.id]
 
   rule {
     enabled    = true
@@ -371,7 +283,7 @@ resource "azurerm_monitor_alert_prometheus_rule_group" "kubernetes_recording_rul
   description         = "Kubernetes Recording Rules Rule Group"
   rule_group_enabled  = true
   interval            = "PT1M"
-  scopes              = [azurerm_monitor_workspace.amw.id, azurerm_kubernetes_cluster.k8s.id]
+  scopes              = [azurerm_monitor_workspace.amw.id, azurerm_kubernetes_cluster.aks.id]
 
   rule {
     enabled    = true
@@ -528,7 +440,7 @@ resource "azurerm_monitor_alert_prometheus_rule_group" "node_and_kubernetes_reco
   description         = "Node and Kubernetes Recording Rules Rule Group for Windows Nodes"
   rule_group_enabled  = true
   interval            = "PT1M"
-  scopes              = [azurerm_monitor_workspace.amw.id, azurerm_kubernetes_cluster.k8s.id]
+  scopes              = [azurerm_monitor_workspace.amw.id, azurerm_kubernetes_cluster.aks.id]
 
   rule {
     enabled    = true
@@ -659,7 +571,7 @@ resource "azurerm_monitor_alert_prometheus_rule_group" "node_recording_rules_rul
   description         = "Node and Kubernetes Recording Rules Rule Group for Windows Nodes"
   rule_group_enabled  = true
   interval            = "PT1M"
-  scopes              = [azurerm_monitor_workspace.amw.id, azurerm_kubernetes_cluster.k8s.id]
+  scopes              = [azurerm_monitor_workspace.amw.id, azurerm_kubernetes_cluster.aks.id]
 
   rule {
     enabled    = true

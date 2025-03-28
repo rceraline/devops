@@ -8,10 +8,10 @@ cluster_admin_ids                     = ["b230bb12-c226-4606-a8ac-9ca05f2fbf66"]
 key_vault_name                        = "kv-20250201"
 log_analytics_workspace_name          = "public-log"
 grafana_dashboard_name                = "grafana-01"
-grafana_version                       = "10"
+grafana_version                       = "11"
 monitor_data_collection_endpoint_name = "dce-aks-01"
 monitor_data_collection_rule_name     = "dcr-01"
-monitor_workspace_name                = "new-amw-01"
+monitor_workspace_name                = "amw-01"
 monitor_private_link_scope_name       = "ampls-01"
 
 pe_subnet = {
