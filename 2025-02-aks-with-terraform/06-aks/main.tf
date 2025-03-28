@@ -70,6 +70,13 @@ resource "azurerm_key_vault_key" "kms" {
   depends_on = [azurerm_role_assignment.crypto_officer]
 }
 
+### Web App Routing Key Vault
+resource "azurerm_role_assignment" "role_for_kv" {
+  scope                = data.azurerm_key_vault.kv.id
+  role_definition_name = "Key Vault Secrets User"
+  principal_id         = azurerm_kubernetes_cluster.aks.web_app_routing[0].web_app_routing_identity[0].object_id
+}
+
 # AKS
 resource "azurerm_kubernetes_cluster" "aks" {
   name                       = var.aks_name
@@ -125,9 +132,18 @@ resource "azurerm_kubernetes_cluster" "aks" {
     azure_rbac_enabled     = true
   }
 
+  key_vault_secrets_provider {
+    secret_rotation_enabled = true
+  }
+
   monitor_metrics {
     annotations_allowed = null
     labels_allowed      = null
+  }
+
+  oms_agent {
+    log_analytics_workspace_id      = azurerm_log_analytics_workspace.log.id
+    msi_auth_for_monitoring_enabled = true
   }
 
   web_app_routing {
