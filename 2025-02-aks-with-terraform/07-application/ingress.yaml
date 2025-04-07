@@ -6,7 +6,7 @@ metadata:
 spec:
   ingressClassName: nginx-internal
   rules:
-    - host: app.mydomain.com
+    - host: app.private.mydomain.com
       http:
         paths:
           - backend:
