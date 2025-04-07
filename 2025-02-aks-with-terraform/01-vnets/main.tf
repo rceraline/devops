@@ -38,15 +38,32 @@ resource "azurerm_virtual_network" "spokes" {
   location            = azurerm_resource_group.rg.location
   resource_group_name = azurerm_resource_group.rg.name
   address_space       = each.value.address_space
+}
 
-  dynamic "subnet" {
-    for_each = each.value.subnets
+resource "azurerm_subnet" "spoke_subnets" {
+  for_each = {
+    for vnet_subnet in var.spoke_vnet_subnets :
+    "${vnet_subnet.vnet_name}_${vnet_subnet.name}" => vnet_subnet
+  }
+
+  name                 = each.value.name
+  address_prefixes     = each.value.address_prefixes
+  virtual_network_name = each.value.vnet_name
+  resource_group_name  = azurerm_virtual_network.hub.resource_group_name
+
+  dynamic "delegation" {
+    for_each = each.value.delegation == null ? [] : [each.value.delegation]
 
     content {
-      name             = subnet.key
-      address_prefixes = subnet.value.address_prefixes
+      name = delegation.value.name
+      service_delegation {
+        actions = delegation.value.service_delegation.actions
+        name    = delegation.value.service_delegation.name
+      }
     }
   }
+
+  depends_on = [azurerm_virtual_network.spokes]
 }
 
 resource "azurerm_virtual_network_peering" "hub_to_spoke" {

@@ -29,11 +29,24 @@ variable "resource_group_name" {
 variable "spoke_vnets" {
   type = map(object({
     address_space = set(string)
-    subnets = map(object({
-      address_prefixes = set(string)
-    }))
   }))
   description = "List of spoke virtual networks."
+}
+
+variable "spoke_vnet_subnets" {
+  type = list(object({
+    name             = string
+    vnet_name        = string
+    address_prefixes = set(string)
+    delegation = optional(object({
+      name = string
+      service_delegation = object({
+        actions = optional(set(string))
+        name    = string
+      })
+    }))
+  }))
+  description = "List of subnets for each spoke VNET."
 }
 
 variable "vpn_pip_name" {
