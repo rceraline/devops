@@ -6,7 +6,7 @@ data "azurerm_resource_group" "rg" {
 
 data "azurerm_lb" "aks" {
   name                = var.aks_load_balancer_name
-  resource_group_name = var.resource_group_name
+  resource_group_name = var.aks_load_balancer_resource_group_name
 }
 
 data "azurerm_subnet" "load_balancer" {

@@ -42,7 +42,7 @@ data "azurerm_private_dns_zone" "prometheus" {
 }
 
 data "azurerm_private_dns_zone" "mydomain" {
-  name                = "mydomain.com"
+  name                = "private.mydomain.com"
   resource_group_name = var.resource_group_name
 }
 

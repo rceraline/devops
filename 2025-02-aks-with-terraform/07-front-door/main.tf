@@ -14,7 +14,7 @@ locals {
 resource "azurerm_cdn_frontdoor_profile" "front_door" {
   name                = local.front_door_profile_name
   resource_group_name = data.azurerm_resource_group.rg.name
-  sku_name            = "Premium"
+  sku_name            = "Premium_AzureFrontDoor"
 }
 
 resource "azurerm_cdn_frontdoor_endpoint" "endpoint" {
@@ -78,7 +78,7 @@ resource "azurerm_private_link_service" "load_balancer" {
   location            = data.azurerm_resource_group.rg.location
 
   visibility_subscription_ids                 = [data.azurerm_client_config.current.subscription_id]
-  load_balancer_frontend_ip_configuration_ids = [data.azurerm_lb.aks.private_ip_address]
+  load_balancer_frontend_ip_configuration_ids = [data.azurerm_lb.aks.frontend_ip_configuration.0.id]
 
   nat_ip_configuration {
     name      = "primary"

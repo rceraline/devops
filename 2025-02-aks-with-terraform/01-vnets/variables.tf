@@ -35,9 +35,10 @@ variable "spoke_vnets" {
 
 variable "spoke_vnet_subnets" {
   type = list(object({
-    name             = string
-    vnet_name        = string
-    address_prefixes = set(string)
+    name                                          = string
+    vnet_name                                     = string
+    address_prefixes                              = set(string)
+    private_link_service_network_policies_enabled = bool
     delegation = optional(object({
       name = string
       service_delegation = object({

@@ -1,0 +1,5 @@
+aks_load_balancer_name                = "kubernetes-internal"
+aks_load_balancer_resource_group_name = "mc_rg-aks-with-terraform-01_aks-01_canadacentral"
+aks_virtual_network_name              = "vnet-aks-01"
+load_balancer_subnet_name             = "snet-lb-01"
+resource_group_name                   = "rg-aks-with-terraform-01"

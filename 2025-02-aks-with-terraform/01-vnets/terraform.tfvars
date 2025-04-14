@@ -35,25 +35,29 @@ spoke_vnets = {
 
 spoke_vnet_subnets = [
   {
-    name             = "snet-lb-01"
-    vnet_name        = "vnet-aks-01"
-    address_prefixes = ["10.1.0.0/24"]
+    name                                          = "snet-lb-01"
+    vnet_name                                     = "vnet-aks-01"
+    address_prefixes                              = ["10.1.0.0/24"]
+    private_link_service_network_policies_enabled = false
   },
   {
-    name             = "snet-pe-01"
-    vnet_name        = "vnet-aks-01"
-    address_prefixes = ["10.1.1.0/24"]
+    name                                          = "snet-pe-01"
+    vnet_name                                     = "vnet-aks-01"
+    address_prefixes                              = ["10.1.1.0/24"]
+    private_link_service_network_policies_enabled = true
   },
   {
-    name             = "snet-nodes-01"
-    vnet_name        = "vnet-aks-01"
-    address_prefixes = ["10.1.2.0/24"]
+    name                                          = "snet-nodes-01"
+    vnet_name                                     = "vnet-aks-01"
+    address_prefixes                              = ["10.1.2.0/24"]
+    private_link_service_network_policies_enabled = true
   },
 
   {
-    name             = "snet-agent-01"
-    vnet_name        = "vnet-cicd-01"
-    address_prefixes = ["10.2.0.0/24"]
+    name                                          = "snet-agent-01"
+    vnet_name                                     = "vnet-cicd-01"
+    address_prefixes                              = ["10.2.0.0/24"]
+    private_link_service_network_policies_enabled = true
     delegation = {
       name = "Microsoft.DevOpsInfrastructure/pools"
       service_delegation = {

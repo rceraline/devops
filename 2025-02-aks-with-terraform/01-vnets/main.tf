@@ -46,10 +46,11 @@ resource "azurerm_subnet" "spoke_subnets" {
     "${vnet_subnet.vnet_name}_${vnet_subnet.name}" => vnet_subnet
   }
 
-  name                 = each.value.name
-  address_prefixes     = each.value.address_prefixes
-  virtual_network_name = each.value.vnet_name
-  resource_group_name  = azurerm_virtual_network.hub.resource_group_name
+  name                                          = each.value.name
+  address_prefixes                              = each.value.address_prefixes
+  virtual_network_name                          = each.value.vnet_name
+  resource_group_name                           = azurerm_virtual_network.hub.resource_group_name
+  private_link_service_network_policies_enabled = each.value.private_link_service_network_policies_enabled
 
   dynamic "delegation" {
     for_each = each.value.delegation == null ? [] : [each.value.delegation]
