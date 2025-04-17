@@ -34,6 +34,22 @@ resource "azurerm_dashboard_grafana_managed_private_endpoint" "amw" {
   private_link_resource_region = data.azurerm_resource_group.rg.location
 }
 
+# resource "null_resource" "approve_grafana_managed_private_endpoint" {
+
+#   provisioner "local-exec" {
+#     command = "az network private-endpoint-connection approve --resource-group $resourceGroup --name $name --resource-type $resourceType --description $description"
+
+#     environment = {
+#       resourceGroup = data.azurerm_resource_group.rg.name
+#       name          = azurerm_monitor_workspace.amw.name
+#       resourceType  = ""
+#       description   = "Approved by Terraform"
+#     }
+#   }
+
+#   depends_on = [azurerm_dashboard_grafana_managed_private_endpoint.amw]
+# }
+
 ######### AMPLS ###############
 
 resource "azurerm_monitor_private_link_scope" "ampls" {
@@ -53,7 +69,7 @@ resource "azurerm_monitor_private_link_scoped_service" "dce" {
 
 ## WORKAROUND: wait a couple of seconds before creating the AMPLS private endpoint
 resource "time_sleep" "ampls_wait" {
-  create_duration = "10s"
+  create_duration = "15s"
   depends_on      = [azurerm_monitor_private_link_scope.ampls]
 }
 
