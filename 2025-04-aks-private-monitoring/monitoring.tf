@@ -3,6 +3,8 @@ locals {
   monitor_private_link_scope_name   = "ampls-01"
   monitor_data_collection_rule_name = "dcr-01"
 
+  data_collection_endpoint_name = "dce-01"
+
   grafana_dashboard_name = "amg-01"
   grafana_version        = "11"
 
@@ -18,9 +20,18 @@ locals {
 ##### Azure Monitor Workspace #######
 
 resource "azurerm_monitor_workspace" "amw" {
-  name                = local.monitor_workspace_name
-  resource_group_name = azurerm_resource_group.rg.name
-  location            = azurerm_resource_group.rg.location
+  name                          = local.monitor_workspace_name
+  resource_group_name           = azurerm_resource_group.rg.name
+  location                      = azurerm_resource_group.rg.location
+  public_network_access_enabled = false
+}
+
+resource "azurerm_monitor_data_collection_endpoint" "dce" {
+  name                          = local.data_collection_endpoint_name
+  resource_group_name           = azurerm_resource_group.rg.name
+  location                      = azurerm_resource_group.rg.location
+  kind                          = "Linux"
+  public_network_access_enabled = false
 }
 
 resource "azurerm_private_endpoint" "amw" {
@@ -65,7 +76,7 @@ resource "azurerm_monitor_private_link_scoped_service" "dce" {
   name                = "link-${local.monitor_private_link_scope_name}-dce"
   resource_group_name = azurerm_resource_group.rg.name
   scope_name          = azurerm_monitor_private_link_scope.ampls.name
-  linked_resource_id  = azurerm_monitor_workspace.amw.default_data_collection_endpoint_id
+  linked_resource_id  = azurerm_monitor_data_collection_endpoint.dce.id
 }
 
 ## WORKAROUND: wait a couple of seconds before creating the AMPLS private endpoint
@@ -105,7 +116,7 @@ resource "azurerm_monitor_data_collection_rule" "dcr" {
   name                        = local.monitor_data_collection_rule_name
   resource_group_name         = azurerm_resource_group.rg.name
   location                    = azurerm_resource_group.rg.location
-  data_collection_endpoint_id = azurerm_monitor_workspace.amw.default_data_collection_endpoint_id
+  data_collection_endpoint_id = azurerm_monitor_data_collection_endpoint.dce.id
   kind                        = "Linux"
 
   destinations {
@@ -145,7 +156,7 @@ resource "azurerm_monitor_data_collection_rule_association" "dcra_rule" {
 resource "azurerm_monitor_data_collection_rule_association" "dcra_endpoint" {
   name                        = "configurationAccessEndpoint"
   target_resource_id          = azurerm_kubernetes_cluster.aks.id
-  data_collection_endpoint_id = azurerm_monitor_workspace.amw.default_data_collection_endpoint_id
+  data_collection_endpoint_id = azurerm_monitor_data_collection_endpoint.dce.id
   description                 = "Association of data collection endpoint. Deleting this association will break the data collection for this AKS Cluster."
 }
 
@@ -187,10 +198,16 @@ resource "azurerm_private_endpoint" "grafana" {
   }
 }
 
-resource "azurerm_role_assignment" "datareaderrole" {
-  scope              = azurerm_monitor_workspace.amw.id
-  role_definition_id = "/subscriptions/${split("/", azurerm_monitor_workspace.amw.id)[2]}/providers/Microsoft.Authorization/roleDefinitions/b0d8363b-8ddd-447d-831f-62ca05bff136"
-  principal_id       = azurerm_dashboard_grafana.grafana.identity.0.principal_id
+# resource "azurerm_role_assignment" "datareaderrole" {
+#   scope              = azurerm_monitor_workspace.amw.id
+#   role_definition_id = "/subscriptions/${split("/", azurerm_monitor_workspace.amw.id)[2]}/providers/Microsoft.Authorization/roleDefinitions/b0d8363b-8ddd-447d-831f-62ca05bff136"
+#   principal_id       = azurerm_dashboard_grafana.grafana.identity.0.principal_id
+# }
+
+resource "azurerm_role_assignment" "monitoring_reader" {
+  scope                = azurerm_monitor_workspace.amw.id
+  role_definition_name = "Monitoring Reader"
+  principal_id         = azurerm_dashboard_grafana.grafana.identity.0.principal_id
 }
 
 resource "azurerm_role_assignment" "grafana_admin" {

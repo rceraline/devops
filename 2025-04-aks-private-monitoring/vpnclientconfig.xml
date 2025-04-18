@@ -10,7 +10,7 @@
         <dnssuffix>.agentsvc.azure-automation.net</dnssuffix>
     </dnssuffixes>
     <dnsservers>
-        <dnsserver>10.0.2.4</dnsserver>
+        <dnsserver>10.0.101.4</dnsserver>
     </dnsservers>
     <excluderoutes i:nil="true" />
     <includeroutes i:nil="true" />
