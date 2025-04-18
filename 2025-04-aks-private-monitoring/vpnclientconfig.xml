@@ -1,0 +1,17 @@
+<clientconfig>
+    <dnssuffixes>
+        <dnssuffix>.blob.core.windows.net</dnssuffix>
+        <dnssuffix>.canadacentral.azmk8s.io</dnssuffix>
+        <dnssuffix>.canadacentral.prometheus.monitor.azure.com</dnssuffix>
+        <dnssuffix>.grafana.azure.com</dnssuffix>
+        <dnssuffix>.monitor.azure.com</dnssuffix>
+        <dnssuffix>.oms.opinsights.azure.com</dnssuffix>
+        <dnssuffix>.ods.opinsights.azure.com</dnssuffix>
+        <dnssuffix>.agentsvc.azure-automation.net</dnssuffix>
+    </dnssuffixes>
+    <dnsservers>
+        <dnsserver>10.0.2.4</dnsserver>
+    </dnsservers>
+    <excluderoutes i:nil="true" />
+    <includeroutes i:nil="true" />
+</clientconfig>
