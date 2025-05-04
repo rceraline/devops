@@ -1,11 +1,8 @@
 
-resource "random_id" "front_door_endpoint_name" {
-  byte_length = 8
-}
 
 locals {
   front_door_profile_name      = "frontdoor-01"
-  front_door_endpoint_name     = "afd-${lower(random_id.front_door_endpoint_name.hex)}"
+  front_door_endpoint_name     = "afd-20250501"
   front_door_origin_group_name = "origin-group-01"
   front_door_origin_name       = "origin-aks-lb-01"
   front_door_route_name        = "route-01"
