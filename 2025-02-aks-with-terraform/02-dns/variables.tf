@@ -3,6 +3,11 @@ variable "resource_group_name" {
   description = "Name of the resource group."
 }
 
+variable "dnsinbound_endpoint_ip_address" {
+  type        = string
+  description = "IP address of the DNS inbound endpoint."
+}
+
 variable "dnsinbound_endpoint_name" {
   type        = string
   description = "Name of the DNS inbound endpoint."

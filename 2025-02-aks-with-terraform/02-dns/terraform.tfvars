@@ -1,8 +1,9 @@
 resource_group_name = "rg-aks-with-terraform-01"
 
-dnsinbound_endpoint_name = "dnsinbound-endpoint-01"
-dnsinbound_subnet_name   = "snet-dnsinbound-01"
-dns_resolver_name        = "dnspr-01"
+dnsinbound_endpoint_ip_address = "10.0.2.4"
+dnsinbound_endpoint_name       = "dnsinbound-endpoint-01"
+dnsinbound_subnet_name         = "snet-dnsinbound-01"
+dns_resolver_name              = "dnspr-01"
 
 hub_vnet_name = "vnet-hub-01"
 private_dns_zone_names = [
