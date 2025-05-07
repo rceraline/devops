@@ -105,10 +105,7 @@ resource "azurerm_virtual_network_gateway" "vpn" {
 
   type     = "Vpn"
   vpn_type = "RouteBased"
-
-  active_active = false
-  enable_bgp    = false
-  sku           = "VpnGw1"
+  sku      = "VpnGw1"
 
   ip_configuration {
     name                          = "vnetGatewayConfig"
