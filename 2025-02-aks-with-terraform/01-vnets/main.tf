@@ -49,7 +49,7 @@ resource "azurerm_subnet" "spoke_subnets" {
   name                                          = each.value.name
   address_prefixes                              = each.value.address_prefixes
   virtual_network_name                          = each.value.vnet_name
-  resource_group_name                           = azurerm_virtual_network.hub.resource_group_name
+  resource_group_name                           = azurerm_resource_group.rg.name
   private_link_service_network_policies_enabled = each.value.private_link_service_network_policies_enabled
 
   dynamic "delegation" {
