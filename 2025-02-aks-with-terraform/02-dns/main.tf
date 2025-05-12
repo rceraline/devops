@@ -12,8 +12,9 @@ resource "azurerm_private_dns_resolver_inbound_endpoint" "inbound" {
   location                = azurerm_private_dns_resolver.dnspr.location
 
   ip_configurations {
-    subnet_id          = data.azurerm_subnet.dnsinbound.id
-    private_ip_address = var.dnsinbound_endpoint_ip_address
+    subnet_id                    = data.azurerm_subnet.dnsinbound.id
+    private_ip_address           = var.dnsinbound_endpoint_ip_address
+    private_ip_allocation_method = "Static"
   }
 }
 
