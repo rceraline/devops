@@ -67,6 +67,6 @@ resource "azurerm_route_table" "rts" {
 resource "azurerm_subnet_route_table_association" "route_associations" {
   for_each = var.to_firewall_route_tables
 
-  subnet_id      = "${data.azurerm_subscription.current.id}/resourceGroups/${data.azurerm_resource_group.rg.name}/providers/Microsoft.Network/virtualNetworks/${each.value.vnet_name}/subnets/${each.value.subnet_id}"
+  subnet_id      = "${data.azurerm_subscription.current.id}/resourceGroups/${data.azurerm_resource_group.rg.name}/providers/Microsoft.Network/virtualNetworks/${each.value.vnet_name}/subnets/${each.value.subnet_name}"
   route_table_id = azurerm_route_table.rts[each.key].id
 }

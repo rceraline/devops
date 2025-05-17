@@ -28,6 +28,6 @@ variable "to_firewall_route_tables" {
     route_name     = string
     address_prefix = string
     vnet_name      = string
-    subnet_id      = string
+    subnet_name    = string
   }))
 }

@@ -8,12 +8,12 @@ to_firewall_route_tables = {
     route_name     = "route-to-aks"
     address_prefix = "10.1.0.0/16"
     vnet_name      = "vnet-cicd-01"
-    subnet_id      = "snet-agent-01"
+    subnet_name    = "snet-agent-01"
   }
   "rt-go-to-firewall-01" = {
     route_name     = "route-to-aks"
     address_prefix = "0.0.0.0/0"
     vnet_name      = "vnet-aks-01"
-    subnet_id      = "snet-nodes-01"
+    subnet_name    = "snet-nodes-01"
   }
 }
