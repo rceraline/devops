@@ -1,0 +1,24 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  annotations:
+    kubernetes.azure.com/tls-cert-keyvault-uri: https://kv20250524.vault.azure.net/certificates/my-certificate
+  name: store-front
+  namespace: aks-store
+spec:
+  ingressClassName: nginx-public
+  rules:
+    - host: app.sometestcustomdomain.com
+      http:
+        paths:
+          - backend:
+              service:
+                name: store-front
+                port:
+                  number: 80
+            path: /
+            pathType: Prefix
+  tls:
+  - hosts:
+    - app.sometestcustomdomain.com
+    secretName: keyvault-store-front
