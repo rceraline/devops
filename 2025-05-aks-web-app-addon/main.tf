@@ -3,9 +3,6 @@ locals {
   key_vault_name       = "kv20250524"
   resource_group_name  = "rg-aks-addon-01"
   custom_dns_zone_name = "sometestcustomdomain.com"
-  aks_dns_zone         = "privatelink.canadacentral.azmk8s.io"
-  vnet_name            = "vnet-01"
-  subnet_name          = "snet-01"
 }
 
 resource "azurerm_resource_group" "rg" {
@@ -49,7 +46,7 @@ resource "azurerm_role_assignment" "controlplane_resourcegroup_contributor" {
 
 resource "azurerm_role_assignment" "web_app_routing_private_dns_zone" {
   scope                = azurerm_dns_zone.domain.id
-  role_definition_name = "Private DNS Zone Contributor"
+  role_definition_name = "DNS Zone Contributor"
   principal_id         = azurerm_kubernetes_cluster.aks.web_app_routing[0].web_app_routing_identity[0].object_id
 }
 
