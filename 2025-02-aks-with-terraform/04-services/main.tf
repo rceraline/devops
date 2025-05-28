@@ -12,11 +12,6 @@ resource "azurerm_key_vault" "kv" {
 
   enable_rbac_authorization     = true
   public_network_access_enabled = false
-
-  network_acls {
-    bypass         = "AzureServices"
-    default_action = "Deny"
-  }
 }
 
 resource "azurerm_private_endpoint" "kv" {
