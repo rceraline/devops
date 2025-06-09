@@ -88,6 +88,7 @@ resource "azurerm_kubernetes_cluster" "aks" {
   private_dns_zone_id        = data.azurerm_private_dns_zone.aks.id
   local_account_disabled     = true
   sku_tier                   = "Standard"
+  automatic_upgrade_channel  = "patch"
 
   default_node_pool {
     name                         = "system"

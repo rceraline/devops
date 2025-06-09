@@ -1,7 +1,7 @@
 resource_group_name                   = "rg-aks-with-terraform-01"
 container_registry_name               = "cr20250201"
 aks_name                              = "aks-01"
-aks_version                           = "1.31"
+aks_version                           = "1.32"
 aks_nodes_subnet_name                 = "snet-nodes-01"
 aks_vnet_name                         = "vnet-aks-01"
 cluster_admin_ids                     = ["b230bb12-c226-4606-a8ac-9ca05f2fbf66"]

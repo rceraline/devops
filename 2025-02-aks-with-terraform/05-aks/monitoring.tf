@@ -34,22 +34,6 @@ resource "azurerm_dashboard_grafana_managed_private_endpoint" "amw" {
   private_link_resource_region = data.azurerm_resource_group.rg.location
 }
 
-# resource "null_resource" "approve_grafana_managed_private_endpoint" {
-
-#   provisioner "local-exec" {
-#     command = "az network private-endpoint-connection approve --resource-group $resourceGroup --name $name --resource-type $resourceType --description $description"
-
-#     environment = {
-#       resourceGroup = data.azurerm_resource_group.rg.name
-#       name          = azurerm_monitor_workspace.amw.name
-#       resourceType  = ""
-#       description   = "Approved by Terraform"
-#     }
-#   }
-
-#   depends_on = [azurerm_dashboard_grafana_managed_private_endpoint.amw]
-# }
-
 ######### AMPLS ###############
 
 resource "azurerm_monitor_private_link_scope" "ampls" {
