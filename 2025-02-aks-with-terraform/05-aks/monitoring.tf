@@ -1,9 +1,10 @@
 ##### Azure Monitor Workspace #######
 
 resource "azurerm_monitor_workspace" "amw" {
-  name                = var.monitor_workspace_name
-  resource_group_name = data.azurerm_resource_group.rg.name
-  location            = data.azurerm_resource_group.rg.location
+  name                          = var.monitor_workspace_name
+  resource_group_name           = data.azurerm_resource_group.rg.name
+  location                      = data.azurerm_resource_group.rg.location
+  public_network_access_enabled = false
 }
 
 resource "azurerm_private_endpoint" "amw" {
@@ -53,7 +54,7 @@ resource "azurerm_monitor_private_link_scoped_service" "dce" {
 
 ## WORKAROUND: wait a couple of seconds before creating the AMPLS private endpoint
 resource "time_sleep" "ampls_wait" {
-  create_duration = "15s"
+  create_duration = "30s"
   depends_on      = [azurerm_monitor_private_link_scope.ampls]
 }
 
@@ -683,5 +684,5 @@ EOF
 resource "azurerm_role_assignment" "grafana_admin" {
   scope                = azurerm_dashboard_grafana.grafana.id
   role_definition_name = "Grafana Admin"
-  principal_id         = "b230bb12-c226-4606-a8ac-9ca05f2fbf66"
+  principal_id         = data.azurerm_client_config.current.object_id
 }
