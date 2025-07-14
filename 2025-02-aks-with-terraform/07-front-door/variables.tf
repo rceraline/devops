@@ -22,3 +22,8 @@ variable "aks_virtual_network_name" {
   type        = string
   description = "Name of the AKS VNET."
 }
+
+variable "domain_name" {
+  type        = string
+  description = "Name of the custom domain."
+}

@@ -6,6 +6,7 @@ locals {
   front_door_origin_group_name = "origin-group-01"
   front_door_origin_name       = "origin-aks-lb-01"
   front_door_route_name        = "route-01"
+  application_fqdn             = join(".", ["app", var.domain_name])
 }
 
 resource "azurerm_cdn_frontdoor_profile" "front_door" {
@@ -22,7 +23,6 @@ resource "azurerm_cdn_frontdoor_endpoint" "endpoint" {
 resource "azurerm_cdn_frontdoor_origin_group" "origin_group" {
   name                     = local.front_door_origin_group_name
   cdn_frontdoor_profile_id = azurerm_cdn_frontdoor_profile.front_door.id
-  session_affinity_enabled = true
 
   load_balancing {
     sample_size                 = 4
@@ -32,7 +32,7 @@ resource "azurerm_cdn_frontdoor_origin_group" "origin_group" {
   health_probe {
     path                = "/"
     request_type        = "HEAD"
-    protocol            = "Https"
+    protocol            = "Http"
     interval_in_seconds = 100
   }
 }
@@ -43,7 +43,8 @@ resource "azurerm_cdn_frontdoor_origin" "aks_load_balancer" {
   enabled                       = true
 
   certificate_name_check_enabled = true
-  host_name                      = data.azurerm_lb.aks.private_ip_address
+  host_name                      = local.application_fqdn
+  origin_host_header             = local.application_fqdn
   http_port                      = 80
   https_port                     = 443
   priority                       = 1
@@ -57,14 +58,16 @@ resource "azurerm_cdn_frontdoor_origin" "aks_load_balancer" {
 }
 
 resource "azurerm_cdn_frontdoor_route" "route" {
-  name                          = local.front_door_route_name
-  cdn_frontdoor_endpoint_id     = azurerm_cdn_frontdoor_endpoint.endpoint.id
-  cdn_frontdoor_origin_group_id = azurerm_cdn_frontdoor_origin_group.origin_group.id
-  cdn_frontdoor_origin_ids      = [azurerm_cdn_frontdoor_origin.aks_load_balancer.id]
+  name                            = local.front_door_route_name
+  cdn_frontdoor_endpoint_id       = azurerm_cdn_frontdoor_endpoint.endpoint.id
+  cdn_frontdoor_origin_group_id   = azurerm_cdn_frontdoor_origin_group.origin_group.id
+  cdn_frontdoor_origin_ids        = [azurerm_cdn_frontdoor_origin.aks_load_balancer.id]
+  cdn_frontdoor_custom_domain_ids = [azurerm_cdn_frontdoor_custom_domain.mydomain_com.id]
+  enabled                         = true
 
   supported_protocols    = ["Http", "Https"]
   patterns_to_match      = ["/*"]
-  forwarding_protocol    = "HttpsOnly"
+  forwarding_protocol    = "HttpOnly"
   link_to_default_domain = true
   https_redirect_enabled = true
 }
@@ -82,4 +85,34 @@ resource "azurerm_private_link_service" "load_balancer" {
     subnet_id = data.azurerm_subnet.load_balancer.id
     primary   = true
   }
+}
+
+## Custom domain
+resource "azurerm_dns_zone" "mydomain_com" {
+  name                = var.domain_name
+  resource_group_name = data.azurerm_resource_group.rg.name
+}
+
+resource "azurerm_dns_cname_record" "app" {
+  name                = "app"
+  zone_name           = azurerm_dns_zone.mydomain_com.name
+  resource_group_name = data.azurerm_resource_group.rg.name
+  ttl                 = 300
+  record              = azurerm_cdn_frontdoor_endpoint.endpoint.host_name
+}
+
+resource "azurerm_cdn_frontdoor_custom_domain" "mydomain_com" {
+  name                     = "app-mydomain-com"
+  cdn_frontdoor_profile_id = azurerm_cdn_frontdoor_profile.front_door.id
+  dns_zone_id              = azurerm_dns_zone.mydomain_com.id
+  host_name                = local.application_fqdn
+
+  tls {
+    certificate_type = "ManagedCertificate"
+  }
+}
+
+resource "azurerm_cdn_frontdoor_custom_domain_association" "mydomain_com" {
+  cdn_frontdoor_custom_domain_id = azurerm_cdn_frontdoor_custom_domain.mydomain_com.id
+  cdn_frontdoor_route_ids        = [azurerm_cdn_frontdoor_route.route.id]
 }
