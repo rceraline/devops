@@ -8,4 +8,6 @@ kubectl apply -f https://raw.githubusercontent.com/Azure-Samples/aks-store-demo/
 kubectl apply -f nginx-internal.yaml
 
 kubectl apply -f ingress.yaml -n aks-store
+
+kubectl delete NginxIngressController default
 ```
