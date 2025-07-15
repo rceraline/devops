@@ -27,3 +27,8 @@ variable "domain_name" {
   type        = string
   description = "Name of the custom domain."
 }
+
+variable "record_name" {
+  type        = string
+  description = "Name of the record in the custom domain."
+}

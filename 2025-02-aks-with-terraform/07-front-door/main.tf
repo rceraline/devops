@@ -6,7 +6,7 @@ locals {
   front_door_origin_group_name = "origin-group-01"
   front_door_origin_name       = "origin-aks-lb-01"
   front_door_route_name        = "route-01"
-  application_fqdn             = join(".", ["app", var.domain_name])
+  application_fqdn             = join(".", [var.record_name, var.domain_name])
 }
 
 resource "azurerm_cdn_frontdoor_profile" "front_door" {
@@ -94,7 +94,7 @@ resource "azurerm_dns_zone" "mydomain_com" {
 }
 
 resource "azurerm_dns_cname_record" "app" {
-  name                = "app"
+  name                = var.record_name
   zone_name           = azurerm_dns_zone.mydomain_com.name
   resource_group_name = data.azurerm_resource_group.rg.name
   ttl                 = 300
